@@ -1,0 +1,20 @@
+.balance {
+  font-size: 35px;
+  font-weight: 700;
+  text-align: left;
+}
+h3 {
+  float: left;
+}
+.usdc-buy {
+  font-size: 25px;
+  font-weight: 400;
+  float: left;
+}
+.card {
+  background-color: unset !important ;
+  color: unset !important;
+}
+.table {
+  color: unset !important;
+}
