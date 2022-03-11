@@ -1,12 +1,17 @@
+@font-face {
+  font-family: 'Helvetica';
+  src: url('./assets/Helvetica-Font-Family/Helvetica-Bold.ttf');
+}
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: Helvetica;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #02075d;
+  background-image: url('./assets/background.jpg');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   color: white;
+  padding: var(--bs-gutter-x,6rem)!important;
 }
 
 code {

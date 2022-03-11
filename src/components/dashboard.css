@@ -1,20 +1,67 @@
 .balance {
   font-size: 35px;
   font-weight: 700;
+  padding-bottom: 40px;
   text-align: left;
 }
-h3 {
-  float: left;
+img {
+  width: 37px;
 }
-.usdc-buy {
+.assets {
+  padding-top: 40px;
+}
+.dropdown {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+}
+.button {
   font-size: 25px;
-  font-weight: 400;
-  float: left;
 }
-.card {
-  background-color: unset !important ;
-  color: unset !important;
+.assets>p {
+  font-size: 30px;
+  font-weight: 500;
+  margin-bottom: unset;
+  text-align: left;
 }
-.table {
-  color: unset !important;
+.table-container {
+  display: block;
+  max-width: 1170px;
+}
+.flex-table:first-of-type {
+  border: unset;
+}
+
+.header {
+  margin: unset!important;
+}
+.flex-table {
+  border: 1px solid #eee;
+  display: flex;
+  flex-flow: row wrap;
+  margin: 10px;
+  padding: 10px;
+  transition: .5s;
+}
+.flex-table:first-of-type .flex-row {
+  color: #fff;
+}
+
+.flex-row, .flex-row-1 {
+  font-size: 20px;
+  padding: 0.7em;
+  text-align: left;
+}
+.flex-row {
+  width: 20%;
+}
+.flex-row-1 {
+  width: 33.33333%;
+}
+.modal-dialog {
+  color: black !important;
+}
+.deposit > div {
+  margin-top: 10px;
+  margin-bottom: 30px;
 }
