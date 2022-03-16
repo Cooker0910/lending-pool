@@ -65,3 +65,26 @@ img {
   margin-top: 10px;
   margin-bottom: 30px;
 }
+#react-confirm-alert {
+  z-index: 9999999;
+}
+.react-confirm-alert-body {
+  z-index: 111111111111111111111111;
+}
+.navbar {
+  padding: 1rem !important;
+}
+.navbar-brand {
+  color: white !important;
+}
+.content-Center {
+  padding : var(--bs-gutter-x,6rem)!important;
+  display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+main a{
+  padding: 20px;
+  cursor: pointer;
+}

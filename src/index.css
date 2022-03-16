@@ -11,7 +11,6 @@ body {
   background-size: 100% 100%;
   background-repeat: no-repeat;
   color: white;
-  padding: var(--bs-gutter-x,6rem)!important;
 }
 
 code {

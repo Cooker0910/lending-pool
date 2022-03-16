@@ -1,29 +1,57 @@
 import React, {useState} from 'react';
 import './dashboard.css';
 import {HiPlusSm, HiMinusSm} from 'react-icons/hi'
+import { Navbar, Nav, Container, Form, Button, InputGroup } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
-import { Form, Col, Button, InputGroup } from "react-bootstrap";
-import icon from '../assets/usdc-coin.png';
+import {confirmAlert} from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import SignUp from '../Account/SignUp';
+import Login from '../Account/LogIn';
+import icon from '../../assets/usdc-coin.png';
 
 const Dashboard = () => {
 
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
+  const [depositWallet, setDepositWallet] = useState('')
+  const [showSignUp, setShowSignUp] = useState(false);
+  const [showLogIn, setShowLogIn] = useState(false);
+  const [showNavbar, setShowNavbar] = useState(true);
+  const [publicKey, setPublicKey] = useState('');
+  const [loginStatus, setLoginStatus] = useState(false);
+  const [selectWallet, setSelectWallet] = useState('')
   const [data, setData] = useState({
     to: "",
     from: ""
   })
 
-  const showDepositModal = () => {
-    setIsDepositOpen(true);
-    document.body.style.backgroundColor = "white";
-  };
+  const showDepositModal = () => { setIsDepositOpen(true); };
   const showWithdrawModal = () => { setIsWithdrawOpen(true); }
   const hideDepositModal = () => { setIsDepositOpen(false); };
-  const hideWithdrawModal = () => { setIsWithdrawOpen(false) }
+  const hideWithdrawModal = () => { setIsWithdrawOpen(false) };
+  const hideSignUpModal = () => { setShowSignUp(false) };
+  const hideLogInModal = () => { setShowLogIn(false) };
+  const showSignUpModal = () => { 
+    setShowLogIn(false);
+    setShowSignUp(true);
+  }
+  const showLogInModal = () => { 
+    setShowSignUp(false);
+    setShowLogIn(true);
+  }
+
+  const successedLogin = () => {
+    setShowNavbar(false)
+    setLoginStatus(true)
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if(value === 'crypto') {
+      console.log('selected cryto')
+    } else {
+      console.log('selected ramp')
+    }
     if(name === 'to' && data.from){
       setData((prevState) => ({
         ...prevState,
@@ -38,10 +66,50 @@ const Dashboard = () => {
     }
   };
 
+  const onDeposit = () => {
+    if(!loginStatus) {
+      alert('Please log in first')
+      return;
+    } else {
+      console.log('OK, wait')
+    }
+  }
+
+  const getPublicKey = (e) => { setPublicKey(e) }
 
   return (
     <>
-      <div className='d-flex flex-column-fluid'>
+      <div>
+        <Navbar>
+          <Container fluid>
+            <Navbar.Brand href="#">
+              {/* <img
+                alt="logo"
+              /> */}
+              ROC Finance
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls="navbarScroll" />
+            <Navbar.Collapse id="navbarScroll">
+              <Nav
+                className="me-auto my-2 my-lg-0"
+                styles={{ maxHeight: '100px' }}
+                navbarScroll
+              >
+              </Nav>
+              { showNavbar ?
+                <Form className="d-flex">
+                  <main>
+                    <a  onClick={() => setShowLogIn(true)}>Log In</a>
+                    <a onClick={() => setShowSignUp(true)}>Sign Up</a>
+                  </main>
+                </Form>
+              : <></>
+              }
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
+      </div>
+      <div className='d-flex flex-column-fluid content-Center'>
         <div className="container-fluid">
           <div className="row balance">
             <div className="col-lg-6 col-md-6">
@@ -112,22 +180,22 @@ const Dashboard = () => {
                   value={data.to} // add this prop
                   onChange={handleChange}
                 >
-                  <option hidden value="">
+                  {/* <option hidden value="">
                     Select...
-                  </option>
+                  </option> */}
                   <option value="crypto">Deposit from Crypto address</option>
                   <option value="ramp">Deposit from Ramp Network</option>
               </Form.Control>
             </Form.Group>
             <Form.Group>
               <Form.Label>Wallet Address</Form.Label>
-              <Form.Control type="text" placeholder="ROC wallet address" />
+              <Form.Control type="text" placeholder="ROC wallet address" value={publicKey} onChange={(e) => setDepositWallet(e.target.value)} />
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button bsstyle='danger' onClick={hideDepositModal}>Cancel</Button>
-          <Button>Deposit</Button>
+          <Button onClick={onDeposit}>Deposit</Button>
         </Modal.Footer>
       </Modal>
       <Modal
@@ -163,6 +231,18 @@ const Dashboard = () => {
           <Button>Withdraw</Button>
         </Modal.Footer>
       </Modal>
+      <SignUp 
+        showModal={showSignUp}
+        hideModal={hideSignUpModal}
+        logInModal={showLogInModal}
+        getPublicKey={getPublicKey}
+      />
+      <Login 
+        showModal={showLogIn}
+        hideModal={hideLogInModal}
+        signUpModal={showSignUpModal}
+        successLog={successedLogin}
+      />
     </>
   )
 }
