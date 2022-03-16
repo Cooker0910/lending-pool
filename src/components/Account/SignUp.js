@@ -12,6 +12,7 @@ const SignUp = (props) => {
     name: "",
     email: "",
     password: "",
+    rePassword: "",
     publicKey: "",
     privateKey: ""
   });
@@ -25,22 +26,16 @@ const SignUp = (props) => {
   }
 
   const register = () => {
-    const {name, email, password} = user;
-    if(name && email && password) {
-      let account = web3.eth.accounts.create();
-      axios.post("http://localhost:5000/api/users/register", {
-        ...user,
-        ['publicKey']: account.address,
-        ['privateKey']: account.privateKey
-      })
-      .then(res => {
-        props.getPublicKey(JSON.parse(res.config.data)['publicKey']);
-        props.logInModal()
-      }
-      )
-    } else {
-      alert("invalide input");
-    }
+    let account = web3.eth.accounts.create();
+    axios.post("http://localhost:5000/api/users/register", {
+      ...user,
+      ['publicKey']: account.address,
+      ['privateKey']: account.privateKey
+    })
+    .then(res => {
+      props.logInModal()
+    })
+    .catch(err => props.errors(err.response.data))
   }
 
   return (
@@ -67,7 +62,7 @@ const SignUp = (props) => {
           </Form.Group>
           <Form.Group>
             <Form.Label>Repassword</Form.Label>
-            <Form.Control type="password" placeholder="re-password" />
+            <Form.Control type="password" name='rePassword' value={user.rePassword} onChange={handleChange} placeholder="re-password" />
           </Form.Group>
         </Form>
       </Modal.Body>

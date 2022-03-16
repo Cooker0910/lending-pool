@@ -26,9 +26,10 @@ const Login = (props) => {
   const login = () => {
     axios.post("http://localhost:5000/api/users/login", user)
       .then((res) => {
-        console.log(res)
+        props.token(res['data']['token'])
         loggedIn()
       })
+      .catch(err => props.errors(err.response.data));
   }
 
   return (

@@ -1,25 +1,30 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './dashboard.css';
 import {HiPlusSm, HiMinusSm} from 'react-icons/hi'
 import { Navbar, Nav, Container, Form, Button, InputGroup } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
-import {confirmAlert} from 'react-confirm-alert';
-import 'react-confirm-alert/src/react-confirm-alert.css';
+import {NotificationContainer,  NotificationManager} from "react-notifications";
+import "react-notifications/lib/notifications.css";
 import SignUp from '../Account/SignUp';
 import Login from '../Account/LogIn';
 import icon from '../../assets/usdc-coin.png';
 
 const Dashboard = () => {
 
+  useEffect(() => {
+    let expire = localStorage.getItem('expire')
+    if(expire * 1000 > Date.now()) {
+      setLoginStatus(true);
+      setPublicKey(localStorage.getItem('publicKey'))
+    }
+  }, [])
+
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
-  const [depositWallet, setDepositWallet] = useState('')
   const [showSignUp, setShowSignUp] = useState(false);
   const [showLogIn, setShowLogIn] = useState(false);
-  const [showNavbar, setShowNavbar] = useState(true);
   const [publicKey, setPublicKey] = useState('');
   const [loginStatus, setLoginStatus] = useState(false);
-  const [selectWallet, setSelectWallet] = useState('')
   const [data, setData] = useState({
     to: "",
     from: ""
@@ -41,7 +46,6 @@ const Dashboard = () => {
   }
 
   const successedLogin = () => {
-    setShowNavbar(false)
     setLoginStatus(true)
   }
 
@@ -75,7 +79,38 @@ const Dashboard = () => {
     }
   }
 
-  const getPublicKey = (e) => { setPublicKey(e) }
+  const getToken = (token) => {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    localStorage.setItem('user_id', JSON.parse(jsonPayload)['id'])
+    localStorage.setItem('publicKey', JSON.parse(jsonPayload)['publicKey'])
+    localStorage.setItem('expire', JSON.parse(jsonPayload)['exp'])
+    setPublicKey(JSON.parse(jsonPayload)['publicKey'])
+  }
+
+  const signupErrors = (errors) => {
+    Object.values(errors).map(function(err) {
+      NotificationManager.warning(
+        err,
+        "",
+        3000
+      );
+    })
+  }
+
+  const loginErrors =(errors) => {
+    Object.values(errors).map(function(err) {
+      NotificationManager.warning(
+        err,
+        "",
+        3000
+      );
+    })
+  }
 
   return (
     <>
@@ -96,7 +131,7 @@ const Dashboard = () => {
                 navbarScroll
               >
               </Nav>
-              { showNavbar ?
+              { !loginStatus ?
                 <Form className="d-flex">
                   <main>
                     <a  onClick={() => setShowLogIn(true)}>Log In</a>
@@ -180,16 +215,13 @@ const Dashboard = () => {
                   value={data.to} // add this prop
                   onChange={handleChange}
                 >
-                  {/* <option hidden value="">
-                    Select...
-                  </option> */}
                   <option value="crypto">Deposit from Crypto address</option>
                   <option value="ramp">Deposit from Ramp Network</option>
               </Form.Control>
             </Form.Group>
             <Form.Group>
               <Form.Label>Wallet Address</Form.Label>
-              <Form.Control type="text" placeholder="ROC wallet address" value={publicKey} onChange={(e) => setDepositWallet(e.target.value)} />
+              <Form.Control type="text" placeholder="ROC wallet address" value={publicKey} />
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -222,7 +254,7 @@ const Dashboard = () => {
             </InputGroup>
             <Form.Group>
               <Form.Label>Wallet Address</Form.Label>
-              <Form.Control type="text" placeholder="ROC wallet address" />
+              <Form.Control type="text" value={publicKey} placeholder="ROC wallet address" />
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -235,14 +267,17 @@ const Dashboard = () => {
         showModal={showSignUp}
         hideModal={hideSignUpModal}
         logInModal={showLogInModal}
-        getPublicKey={getPublicKey}
+        errors={signupErrors}
       />
       <Login 
         showModal={showLogIn}
         hideModal={hideLogInModal}
         signUpModal={showSignUpModal}
         successLog={successedLogin}
+        token={getToken}
+        errors={loginErrors}
       />
+      <NotificationContainer />
     </>
   )
 }
