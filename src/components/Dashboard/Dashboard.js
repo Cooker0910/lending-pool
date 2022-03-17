@@ -112,6 +112,11 @@ const Dashboard = () => {
     })
   }
 
+  const logout = () => {
+    localStorage.clear();
+    setLoginStatus(false)
+  }
+
   return (
     <>
       <div>
@@ -138,7 +143,11 @@ const Dashboard = () => {
                     <a onClick={() => setShowSignUp(true)}>Sign Up</a>
                   </main>
                 </Form>
-              : <></>
+              : <Form className="d-flex">
+                  <main>
+                    <a  onClick={logout}>Log Out</a>
+                  </main>
+                </Form>
               }
             </Navbar.Collapse>
           </Container>
