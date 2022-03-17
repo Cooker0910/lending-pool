@@ -9,7 +9,6 @@ const SignUp = (props) => {
   const web3 = new Web3('http://localhost:8545');
 
   const [user, setUser] = useState({
-    name: "",
     email: "",
     password: "",
     rePassword: "",
@@ -48,10 +47,10 @@ const SignUp = (props) => {
       </Modal.Header>
       <Modal.Body>
         <Form className='deposit'>
-          <Form.Group>
+          {/* <Form.Group>
             <Form.Label>User Name</Form.Label>
             <Form.Control type="text" name='name' value={user.name} onChange={handleChange} placeholder="Input your user name" />
-          </Form.Group>
+          </Form.Group> */}
           <Form.Group>
             <Form.Label>Email</Form.Label>
             <Form.Control type="email" name='email' value={user.email} onChange={handleChange} placeholder="Input your user name" />
