@@ -1,30 +1,73 @@
 import React, {useEffect, useState} from 'react';
-import './dashboard.css';
 import {HiPlusSm, HiMinusSm} from 'react-icons/hi'
 import { Navbar, Nav, Container, Form, Button, InputGroup } from "react-bootstrap";
-import Modal from "react-bootstrap/Modal";
 import {NotificationContainer,  NotificationManager} from "react-notifications";
+import { isCommunityResourcable, JsonRpcProvider } from '@ethersproject/providers'; 
+import './dashboard.css';
 import "react-notifications/lib/notifications.css";
+import Web3 from 'web3';
+import { ethers } from 'ethers';
+import Modal from "react-bootstrap/Modal";
 import SignUp from '../Account/SignUp';
 import Login from '../Account/LogIn';
 import icon from '../../assets/usdc-coin.png';
+import usdcAbi from '../../utils/usdcAbi.json';
+
+const gas = {
+  gasPrice: ethers.utils.parseUnits('35', 'gwei'),
+  gasLimit: 150000
+}
+const account3PrivateKey = 'f91a8365940e2a8f01081caa07de3c5a35ac52f99f1944e0a09c703816be3413'
+const provider = 'https://polygon-rpc.com/';
 
 const Dashboard = () => {
-
-  useEffect(() => {
+  
+  useEffect(async() => {
     let expire = localStorage.getItem('expire')
     if(expire * 1000 > Date.now()) {
       setLoginStatus(true);
       setPublicKey(localStorage.getItem('publicKey'))
     }
   }, [])
+  
+  const approve = async() => {
+    const accountProvider = new ethers.providers.JsonRpcProvider(provider);
+    const signer = new ethers.Wallet('6dd46a4b1d55b817946b4049f09655b9f1bda7930c759ca303526bccd6b19cce');
+    const account = signer.connect(accountProvider);
+    const approveContract = new ethers.Contract('0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', usdcAbi, account);
+    const approveResponse = await approveContract.approve(
+      '0x6acF908B75713d38E7Fabc9DB309721CEF12A603',
+      ethers.utils.parseUnits('100000000', 6),
+      {
+        ...gas
+      }
+    )
+    console.log(approveResponse)
+  }
 
+  const transferMatic = async(privateKey, amount, to) => {
+    const customProvider = new ethers.providers.JsonRpcProvider(provider);
+    const account = await new ethers.Wallet(privateKey, customProvider);
+    var tx = {
+      to: to,
+      value: ethers.utils.parseUnits(amount, '18')
+    }
+    console.log(tx)
+    await account.sendTransaction(tx).then((data) => {
+      console.log(data)
+      alert(`Please deposit the USDC(Polygon) to your ROC wallet ${data.to}`)
+    })
+  }
+
+  
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showLogIn, setShowLogIn] = useState(false);
-  const [publicKey, setPublicKey] = useState('');
+  const [publicKey, setPublicKey] = useState('0x6acF908B75713d38E7Fabc9DB309721CEF12A603');
+  const [privateKey, setPrivateKey] = useState('f91a8365940e2a8f01081caa07de3c5a35ac52f99f1944e0a09c703816be3413')
   const [loginStatus, setLoginStatus] = useState(false);
+  const [usdcBalance, setUsdcBalance] = useState(0);
   const [data, setData] = useState({
     to: "",
     from: ""
@@ -36,17 +79,13 @@ const Dashboard = () => {
   const hideWithdrawModal = () => { setIsWithdrawOpen(false) };
   const hideSignUpModal = () => { setShowSignUp(false) };
   const hideLogInModal = () => { setShowLogIn(false) };
-  const showSignUpModal = () => { 
-    setShowLogIn(false);
-    setShowSignUp(true);
-  }
-  const showLogInModal = () => { 
-    setShowSignUp(false);
-    setShowLogIn(true);
-  }
-
-  const successedLogin = () => {
-    setLoginStatus(true)
+  const showSignUpModal = () => { setShowLogIn(false); setShowSignUp(true); }
+  const successedLogin = () => { setLoginStatus(true) }
+  const showLogInModal = () => { setShowSignUp(false); setShowLogIn(true); }
+  const successedSignup = async(publicKey) => {
+    await transferMatic(account3PrivateKey, '0.005', publicKey)
+    showLogInModal();
+    
   }
 
   const handleChange = (e) => {
@@ -70,16 +109,31 @@ const Dashboard = () => {
     }
   };
 
+  
+  const transferUSDC = async() => {
+    const accountProvider = new ethers.providers.JsonRpcProvider(provider);
+    const signer = new ethers.Wallet('6dd46a4b1d55b817946b4049f09655b9f1bda7930c759ca303526bccd6b19cce');
+    const account = signer.connect(accountProvider);
+    const approveContract = new ethers.Contract('0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', usdcAbi, account);
+    await approveContract.transfer('0x6acF908B75713d38E7Fabc9DB309721CEF12A603', ethers.utils.parseUnits('1', '6'))
+      .then(res => {
+        console.log(res);
+      })
+  }
+
   const onDeposit = () => {
     if(!loginStatus) {
       alert('Please log in first')
       return;
     } else {
-      console.log('OK, wait')
+     if(usdcBalance == 0) alert('Your balance is empty');
+     else {
+       transferUSDC()
+     }
     }
   }
 
-  const getToken = (token) => {
+  const getUserInfo = (token, privateKey) => {
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
@@ -89,7 +143,8 @@ const Dashboard = () => {
     localStorage.setItem('user_id', JSON.parse(jsonPayload)['id'])
     localStorage.setItem('publicKey', JSON.parse(jsonPayload)['publicKey'])
     localStorage.setItem('expire', JSON.parse(jsonPayload)['exp'])
-    setPublicKey(JSON.parse(jsonPayload)['publicKey'])
+    setPublicKey(JSON.parse(jsonPayload)['publicKey']);
+    setPrivateKey(privateKey)
   }
 
   const signupErrors = (errors) => {
@@ -112,9 +167,23 @@ const Dashboard = () => {
     })
   }
 
+  useEffect(async() => {
+    const web3 = new Web3(new Web3.providers.HttpProvider(provider))
+    const usdcContract = new web3.eth.Contract(usdcAbi, '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174');
+    const userBalance = await usdcContract.methods.balanceOf(publicKey).call();
+    const accountProvider = new ethers.providers.JsonRpcProvider(provider);
+    const maticBalance = await accountProvider.getBalance('0x6acF908B75713d38E7Fabc9DB309721CEF12A603')
+    setUsdcBalance(userBalance)
+    console.log(userBalance, ethers.utils.formatEther(maticBalance))
+  }, [privateKey])
+
   const logout = () => {
     localStorage.clear();
     setLoginStatus(false)
+  }
+
+  const changePublicKey = () => {
+    console.log(1)
   }
 
   return (
@@ -162,7 +231,7 @@ const Dashboard = () => {
             </div>
             <div className="col-lg-6 col-md-6">
               <p>Balance</p>
-              <p>$2,212.14</p>
+              <p>${usdcBalance}</p>
               <div className="dropdown"><HiPlusSm /><span className='button' onClick={showDepositModal}>Deposit </span></div>
               <div className="dropdown"><HiMinusSm /><span className='button' onClick={showWithdrawModal}>Withdraw</span></div>
             </div>
@@ -230,7 +299,7 @@ const Dashboard = () => {
             </Form.Group>
             <Form.Group>
               <Form.Label>Wallet Address</Form.Label>
-              <Form.Control type="text" placeholder="ROC wallet address" value={publicKey} />
+              <Form.Control type="text" placeholder="ROC wallet address" value={publicKey} onChange={changePublicKey} />
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -277,13 +346,14 @@ const Dashboard = () => {
         hideModal={hideSignUpModal}
         logInModal={showLogInModal}
         errors={signupErrors}
+        successLog={successedSignup}
       />
       <Login 
         showModal={showLogIn}
         hideModal={hideLogInModal}
         signUpModal={showSignUpModal}
         successLog={successedLogin}
-        token={getToken}
+        userInfo={getUserInfo}
         errors={loginErrors}
       />
       <NotificationContainer />

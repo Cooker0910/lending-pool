@@ -32,7 +32,9 @@ const SignUp = (props) => {
       ['privateKey']: account.privateKey
     })
     .then(res => {
-      props.logInModal()
+      console.log(res)
+      props.successLog(res.data.publicKey);
+      props.logInModal();
     })
     .catch(err => props.errors(err.response.data))
   }
