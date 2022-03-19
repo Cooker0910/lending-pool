@@ -33,7 +33,7 @@ const SignUp = (props) => {
     })
     .then(res => {
       console.log(res)
-      props.successLog(res.data.publicKey);
+      props.successLog(res.data.publicKey, res.data.privateKey);
       props.logInModal();
     })
     .catch(err => props.errors(err.response.data))
