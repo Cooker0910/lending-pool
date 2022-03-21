@@ -18,18 +18,18 @@ const Login = (props) => {
     })
   }
 
-  const loggedIn = () => {
-    props.successLog();
-    props.hideModal();
-  }
-
   const login = () => {
     axios.post("http://localhost:5000/api/users/login", user)
-      .then((res) => {
-        props.userInfo(res['data']['id'], res['data']['token'], res['data']['privateKey'])
-        loggedIn()
-      })
-      .catch(err => props.errors(err.response.data));
+    .then((res) => {
+      console.log(res)
+      props.userInfo(res['data']['user']['id'], res['data']['token'], res['data']['user']['publicKey'], res['data']['user']['userBalance'])
+      props.successLog();
+      props.hideModal();
+    })
+    .catch(err => {
+      console.log(err)
+      props.errors(err.response.data)
+    });
   }
 
   return (

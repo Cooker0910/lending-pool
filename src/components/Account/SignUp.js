@@ -2,18 +2,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import {Form, Button} from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
-import Web3 from 'web3';
 
 const SignUp = (props) => {
-
-  const web3 = new Web3('http://localhost:8545');
 
   const [user, setUser] = useState({
     email: "",
     password: "",
     rePassword: "",
-    publicKey: "",
-    privateKey: ""
   });
 
   const handleChange = (e) => {
@@ -25,15 +20,12 @@ const SignUp = (props) => {
   }
 
   const register = () => {
-    let account = web3.eth.accounts.create();
+
     axios.post("http://localhost:5000/api/users/register", {
       ...user,
-      ['publicKey']: account.address,
-      ['privateKey']: account.privateKey
     })
     .then(res => {
       console.log(res)
-      props.successLog(res.data.publicKey, res.data.privateKey);
       props.logInModal();
     })
     .catch(err => props.errors(err.response.data))

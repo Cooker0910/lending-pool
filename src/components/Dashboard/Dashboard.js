@@ -4,7 +4,6 @@ import { Navbar, Nav, Container, Form, Button, InputGroup } from "react-bootstra
 import {NotificationContainer,  NotificationManager} from "react-notifications";
 import './dashboard.css';
 import "react-notifications/lib/notifications.css";
-import Web3 from 'web3';
 import { ethers } from 'ethers';
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
@@ -13,13 +12,12 @@ import Login from '../Account/LogIn';
 import icon from '../../assets/usdc-coin.png';
 import usdcAbi from '../../utils/usdcAbi.json';
 
-const gas = {
-  gasPrice: ethers.utils.parseUnits('32', 'gwei'),
-  gasLimit: 100000
-}
 const account3PrivateKey = 'f91a8365940e2a8f01081caa07de3c5a35ac52f99f1944e0a09c703816be3413'
 const adminWallet = '0x6acF908B75713d38E7Fabc9DB309721CEF12A603'
+const apporveWallet = '0x43E7b3068dF515D316573F8C06340f75A2ce942F'
+const usdcAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'
 const url = 'https://polygon-rpc.com/';
+const customProvider = new ethers.providers.JsonRpcProvider(url);
 
 const Dashboard = () => {
   
@@ -29,59 +27,37 @@ const Dashboard = () => {
       setLoginStatus(true);
       setPublicKey(localStorage.getItem('publicKey'))
     }
-    getUserData(localStorage.getItem('user_id'))
+    if(localStorage.getItem('user_id') != null) {
+      getUserData(localStorage.getItem('user_id'))
+    }
   }, [])
 
   const getUserData = (id) => {
-    axios.get('http://45.153.242.239:5000/api/users/' + id)
+    axios.get('http://localhost:5000/api/users/' + id)
       .then(res => {
-        if(res['data']['usdcBalance'] === 0) {
+        if(res['data']['userBalance'] === 0) {
           return
         } else {
           console.log( res)
-          setPublicKey(res['data']['publicKey'])
-          setPrivateKey(res['data']['privateKey'])
+          setUsdcBalance(res['data']['userBalance'])
         }
       })
   }
 
-  const transferMatic = async(account3PrivateKey, amount, to, userPrivateKey) => {
-    const customProvider = new ethers.providers.JsonRpcProvider(url);
-    const fromAccount = new ethers.Wallet(account3PrivateKey, customProvider);
-    const toAccount = new ethers.Wallet(userPrivateKey, customProvider);
-    
-    const usdcContract = new ethers.Contract("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", [
-      "function balanceOf(address owner) external view returns (uint256)",
-      "function approve(address to, uint256 amount) external"
-    ], toAccount);
+  const customContract = (customPrivateKey) => {
+    const customAccount = new ethers.Wallet(customPrivateKey, customProvider);
+    const newContract = new ethers.Contract(usdcAddress, usdcAbi, customAccount)
+    return newContract;
+  } 
 
-    const tx = await fromAccount.sendTransaction({
-        to: to,
-        value: ethers.utils.parseUnits(amount, '18')
-    });
-
-    if(tx) {
-      const recipient = await tx.wait();
-      console.log(recipient)
-      const balance = await usdcContract.balanceOf(to);
-      console.log(balance)
-      const txApprove = await usdcContract.approve(adminWallet, ethers.constants.MaxUint256);
-      if(txApprove) {
-        const recipientApprove = await txApprove.wait();
-        console.log(recipientApprove);
-      }
-    }      
-  }
-
-  
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showLogIn, setShowLogIn] = useState(false);
   const [publicKey, setPublicKey] = useState('');
-  const [privateKey, setPrivateKey] = useState('')
   const [loginStatus, setLoginStatus] = useState(false);
   const [usdcBalance, setUsdcBalance] = useState(0);
+  const [userId, setUserId] = useState('');
   const [data, setData] = useState({
     to: "",
     from: ""
@@ -96,12 +72,6 @@ const Dashboard = () => {
   const showSignUpModal = () => { setShowLogIn(false); setShowSignUp(true); }
   const successedLogin = () => { setLoginStatus(true) }
   const showLogInModal = () => { setShowSignUp(false); setShowLogIn(true); }
-  const successedSignup = async(publicKey, signedPrivateKey) => {
-    setPrivateKey(signedPrivateKey)
-    await transferMatic(account3PrivateKey, '0.003', publicKey, signedPrivateKey)
-    showLogInModal();
-    
-  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -124,53 +94,38 @@ const Dashboard = () => {
     }
   };
 
-  const transferUSDC = async(amount, userPublicKey, userPrivateKey) => {
-    const accountProvider = new ethers.providers.JsonRpcProvider(url);
-    const toAccount = new ethers.Wallet(account3PrivateKey, accountProvider);
-    const fromAccount = new ethers.Wallet(userPrivateKey, accountProvider);
-    const usdcContract = new ethers.Contract('0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', usdcAbi, fromAccount);
-    const balance = await usdcContract.balanceOf(userPublicKey);
-    const formatBalace = await ethers.utils.formatUnits(balance, 6);
-    const formatted = formatBalace * 100000;
-    console.log(formatted, userPublicKey, amount)
-    const signContract = new ethers.Contract('0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', usdcAbi, toAccount);
-    await signContract.transferFrom(userPublicKey, adminWallet, formatted)
-      .then(res => {
-        console.log(res)
-        alert(`Successfull Deposit \n Deposit Amount: ${formatBalace}`);
-        hideLogInModal();
-      })
-  }
-
-  const getUSDCBalance = async() => {
-    const id = localStorage.getItem('user_id');
-    axios.get('http://45.153.242.239:5000/api/users/' + id)
-      .then(res => {
-        setPublicKey(res['data']['publicKey'])
-        setPrivateKey(res['data']['privateKey'])
-        transferUSDC(res['data']['usdcBalance'], res['data']['publicKey'], res['data']['privateKey'])
-      })
-  }
-
-  const onDeposit = () => {
+  const onDeposit = async() => {
     if(!loginStatus) {
       alert('Please log in first')
       return;
-    } else getUSDCBalance(publicKey)
+    } else {
+      console.log(userId)
+      await axios.get('http://localhost:5000/api/users/deposit/' + localStorage.getItem('user_id'))
+      .then(res => {
+        console.log(res)
+        hideDepositModal();
+        alert("Successed Deposit")
+        setUsdcBalance(0)
+      })
+      .catch(console.log);
+      return;
+    }
   }
 
-  const getUserInfo = (id, token, privateKey) => {
+  const getUserInfo = (id, token, userPublicKey, userBalance) => {
+    console.log(id, userPublicKey,'\=======')
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
 
-    localStorage.setItem('user_id', JSON.parse(jsonPayload)['id'])
-    localStorage.setItem('publicKey', JSON.parse(jsonPayload)['publicKey'])
+    setUserId(id)
+    localStorage.setItem('user_id', id);
+    localStorage.setItem('publicKey', userPublicKey)
     localStorage.setItem('expire', JSON.parse(jsonPayload)['exp'])
-    setPublicKey(JSON.parse(jsonPayload)['publicKey']);
-    setPrivateKey(privateKey)
+    setPublicKey(userPublicKey);
+    setUsdcBalance(userBalance)
   }
 
   const signupErrors = (errors) => {
@@ -192,23 +147,6 @@ const Dashboard = () => {
       );
     })
   }
-
-  useEffect(async() => {
-    if(localStorage.getItem('publicKey') !== null) {
-      const web3 = new Web3(new Web3.providers.HttpProvider(url))
-      const usdcContract = new web3.eth.Contract(usdcAbi, '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174');
-      const userBalance = await usdcContract.methods.balanceOf(localStorage.getItem('publicKey')).call();
-      const accountProvider = new ethers.providers.JsonRpcProvider(url);
-      const maticBalance = await accountProvider.getBalance(localStorage.getItem('publicKey'))
-      const userBalance1 = ethers.utils.formatEther(maticBalance)
-      const user_id = localStorage.getItem('user_id')
-      const balances = { user_id, userBalance, userBalance1 };
-      setUsdcBalance(userBalance/1000000)
-      axios.post("http://45.153.242.239:5000/api/users/update", balances)
-        .then(res => console.log(res))
-        .catch(err => console.log);
-    }
-  }, [privateKey])
 
   const logout = () => {
     localStorage.clear();
@@ -379,7 +317,6 @@ const Dashboard = () => {
         hideModal={hideSignUpModal}
         logInModal={showLogInModal}
         errors={signupErrors}
-        successLog={successedSignup}
       />
       <Login 
         showModal={showLogIn}
