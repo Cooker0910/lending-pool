@@ -4,20 +4,11 @@ import { Navbar, Nav, Container, Form, Button, InputGroup } from "react-bootstra
 import {NotificationContainer,  NotificationManager} from "react-notifications";
 import './dashboard.css';
 import "react-notifications/lib/notifications.css";
-import { ethers } from 'ethers';
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import SignUp from '../Account/SignUp';
 import Login from '../Account/LogIn';
 import icon from '../../assets/usdc-coin.png';
-import usdcAbi from '../../utils/usdcAbi.json';
-
-const account3PrivateKey = 'f91a8365940e2a8f01081caa07de3c5a35ac52f99f1944e0a09c703816be3413'
-const adminWallet = '0x6acF908B75713d38E7Fabc9DB309721CEF12A603'
-const apporveWallet = '0x43E7b3068dF515D316573F8C06340f75A2ce942F'
-const usdcAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'
-const url = 'https://polygon-rpc.com/';
-const customProvider = new ethers.providers.JsonRpcProvider(url);
 
 const Dashboard = () => {
   
@@ -43,12 +34,6 @@ const Dashboard = () => {
         }
       })
   }
-
-  const customContract = (customPrivateKey) => {
-    const customAccount = new ethers.Wallet(customPrivateKey, customProvider);
-    const newContract = new ethers.Contract(usdcAddress, usdcAbi, customAccount)
-    return newContract;
-  } 
 
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
@@ -113,7 +98,7 @@ const Dashboard = () => {
   }
 
   const getUserInfo = (id, token, userPublicKey, userBalance) => {
-    console.log(id, userPublicKey,'\=======')
+    console.log(id, userPublicKey,'=======')
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
@@ -130,7 +115,7 @@ const Dashboard = () => {
 
   const signupErrors = (errors) => {
     Object.values(errors).map(function(err) {
-      NotificationManager.warning(
+      return NotificationManager.warning(
         err,
         "",
         3000
@@ -140,7 +125,7 @@ const Dashboard = () => {
 
   const loginErrors =(errors) => {
     Object.values(errors).map(function(err) {
-      NotificationManager.warning(
+      return NotificationManager.warning(
         err,
         "",
         3000
@@ -179,13 +164,13 @@ const Dashboard = () => {
               { !loginStatus ?
                 <Form className="d-flex">
                   <main>
-                    <a  onClick={() => setShowLogIn(true)}>Log In</a>
+                    <a onClick={() => setShowLogIn(true)}>Log In</a>
                     <a onClick={() => setShowSignUp(true)}>Sign Up</a>
                   </main>
                 </Form>
               : <Form className="d-flex">
                   <main>
-                    <a  onClick={logout}>Log Out</a>
+                    <a onClick={logout}>Log Out</a>
                   </main>
                 </Form>
               }
