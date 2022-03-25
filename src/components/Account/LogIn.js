@@ -22,7 +22,7 @@ const Login = (props) => {
     axios.post("http://localhost:5000/api/users/login", user)
     .then((res) => {
       console.log(res)
-      props.userInfo(res['data']['user']['id'], res['data']['token'], res['data']['user']['publicKey'], res['data']['user']['userBalance'])
+      props.userInfo(res['data']['user']['id'], res['data']['token'], res['data']['user']['publicKey'], res['data']['user']['userBalance'], res['data']['totalBalance'])
       props.successLog();
       props.hideModal();
     })

@@ -31,6 +31,7 @@ const Dashboard = () => {
         } else {
           console.log( res)
           setUsdcBalance(res['data']['userBalance'])
+          setCurrentBalance(res['data']['totalBalance'])
         }
       })
   }
@@ -42,6 +43,7 @@ const Dashboard = () => {
   const [publicKey, setPublicKey] = useState('');
   const [loginStatus, setLoginStatus] = useState(false);
   const [usdcBalance, setUsdcBalance] = useState(0);
+  const [currentBalance, setCurrentBalance] = useState(0)
   const [userId, setUserId] = useState('');
   const [data, setData] = useState({
     to: "",
@@ -85,6 +87,7 @@ const Dashboard = () => {
       return;
     } else {
       console.log(userId)
+      return;
       await axios.get('http://localhost:5000/api/users/deposit/' + localStorage.getItem('user_id'))
       .then(res => {
         console.log(res)
@@ -97,7 +100,7 @@ const Dashboard = () => {
     }
   }
 
-  const getUserInfo = (id, token, userPublicKey, userBalance) => {
+  const getUserInfo = (id, token, userPublicKey, userBalance, user_balance) => {
     console.log(id, userPublicKey,'=======')
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -110,7 +113,8 @@ const Dashboard = () => {
     localStorage.setItem('publicKey', userPublicKey)
     localStorage.setItem('expire', JSON.parse(jsonPayload)['exp'])
     setPublicKey(userPublicKey);
-    setUsdcBalance(userBalance)
+    setUsdcBalance(userBalance);
+    setCurrentBalance(user_balance)
   }
 
   const signupErrors = (errors) => {
@@ -187,7 +191,7 @@ const Dashboard = () => {
             </div>
             <div className="col-lg-6 col-md-6">
               <p>Balance</p>
-              <p>${usdcBalance}</p>
+              <p>${currentBalance}</p>
               <div className="dropdown"><HiPlusSm /><span className='button' onClick={showDepositModal}>Deposit </span></div>
               <div className="dropdown"><HiMinusSm /><span className='button' onClick={showWithdrawModal}>Withdraw</span></div>
             </div>
