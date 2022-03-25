@@ -44,6 +44,7 @@ const Dashboard = () => {
   const [loginStatus, setLoginStatus] = useState(false);
   const [usdcBalance, setUsdcBalance] = useState(0);
   const [currentBalance, setCurrentBalance] = useState(0)
+  const [depositType, setDepositType] = useState(false)
   const [userId, setUserId] = useState('');
   const [data, setData] = useState({
     to: "",
@@ -60,12 +61,13 @@ const Dashboard = () => {
   const successedLogin = () => { setLoginStatus(true) }
   const showLogInModal = () => { setShowSignUp(false); setShowLogIn(true); }
 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if(value === 'crypto') {
-      console.log('selected cryto')
+      setDepositType(false)
     } else {
-      console.log('selected ramp')
+      setDepositType(true)
     }
     if(name === 'to' && data.from){
       setData((prevState) => ({
@@ -86,7 +88,14 @@ const Dashboard = () => {
       alert('Please log in first')
       return;
     } else {
-      console.log(userId)
+      if(!depositType) {
+        alert('ok')
+        return;
+      }
+      else {
+        console.log(1)
+
+      }
       return;
       await axios.get('http://localhost:5000/api/users/deposit/' + localStorage.getItem('user_id'))
       .then(res => {
