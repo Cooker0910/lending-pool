@@ -30,7 +30,6 @@ const Dashboard = () => {
           return
         } else {
           console.log( res)
-          setUsdcBalance(res['data']['userBalance'])
           setCurrentBalance(res['data']['totalBalance'])
         }
       })
@@ -42,10 +41,9 @@ const Dashboard = () => {
   const [showLogIn, setShowLogIn] = useState(false);
   const [publicKey, setPublicKey] = useState('');
   const [loginStatus, setLoginStatus] = useState(false);
-  const [usdcBalance, setUsdcBalance] = useState(0);
+  const [depoistAmount, setDepositAmount] = useState(0)
   const [currentBalance, setCurrentBalance] = useState(0)
   const [depositType, setDepositType] = useState(false)
-  const [userId, setUserId] = useState('');
   const [data, setData] = useState({
     to: "",
     from: ""
@@ -96,20 +94,10 @@ const Dashboard = () => {
         console.log(1)
 
       }
-      return;
-      await axios.get('http://localhost:5000/api/users/deposit/' + localStorage.getItem('user_id'))
-      .then(res => {
-        console.log(res)
-        hideDepositModal();
-        alert("Successed Deposit")
-        setUsdcBalance(0)
-      })
-      .catch(console.log);
-      return;
     }
   }
 
-  const getUserInfo = (id, token, userPublicKey, userBalance, user_balance) => {
+  const getUserInfo = (id, token, userPublicKey, userBalance, user_depositAmount, user_balance) => {
     console.log(id, userPublicKey,'=======')
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -117,12 +105,11 @@ const Dashboard = () => {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
 
-    setUserId(id)
     localStorage.setItem('user_id', id);
     localStorage.setItem('publicKey', userPublicKey)
     localStorage.setItem('expire', JSON.parse(jsonPayload)['exp'])
     setPublicKey(userPublicKey);
-    setUsdcBalance(userBalance);
+    setDepositAmount(user_depositAmount)
     setCurrentBalance(user_balance)
   }
 
@@ -220,8 +207,8 @@ const Dashboard = () => {
                   <img src={icon} alt="usdc icon" /> stablecoin</div>
                 <div className="flex-row" role="cell">$1</div>
                 <div className="flex-row" role="cell">6%</div>
-                <div className="flex-row" role="cell">0.04484529 USDC</div>
-                <div className="flex-row" role="cell">0.00066222 USDC</div>
+                <div className="flex-row" role="cell">{currentBalance} USDC</div>
+                <div className="flex-row" role="cell">{currentBalance-depoistAmount} USDC</div>
               </div>
             </div>
           </div>
