@@ -8,7 +8,9 @@ import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import SignUp from '../Account/SignUp';
 import Login from '../Account/LogIn';
+import Spinner from '../Spinner/Spinner';
 import icon from '../../assets/usdc-coin.png';
+let poolValue = 0 ,allocation = 0, depositAmount = 0, _currenctBalance = 0, _interestEarned = 0, _interest = 0, _withdrawAmount = 0;
 
 const Dashboard = () => {
   
@@ -21,29 +23,48 @@ const Dashboard = () => {
     if(localStorage.getItem('user_id') != null) {
       getUserData(localStorage.getItem('user_id'))
     }
+    log(email)
   }, [])
 
   const getUserData = (id) => {
-    axios.get('http://localhost:5000/api/users/' + id)
+    axios.get('http://45.153.242.239:5000/api/users/' + id)
       .then(res => {
-        if(res['data']['userBalance'] === 0) {
-          return
-        } else {
-          console.log( res)
-          setCurrentBalance(res['data']['totalBalance'])
-        }
+        log(res)
+        setEmail(res['data']['data']['email'])
+        allocation = res['data']['data']['allocation'] === undefined ? 0 : res['data']['data']['allocation'];
+        poolValue = res['data']['totalValue']
+        depositAmount = res['data']['data']['depositAmount'] === undefined ? 0 : res['data']['data']['depositAmount']
+        _withdrawAmount = res['data']['data']['withdrawnAmount'] === undefined ? 0: res['data']['data']['withdrawnAmount']
+        _currenctBalance = (poolValue * allocation).toFixed(2)
+        _interestEarned = (_currenctBalance - depositAmount + _withdrawAmount).toFixed(2)
+        if(_currenctBalance !== (depositAmount - _withdrawAmount).toFixed(2)) _interest = depositAmount === 0 ? 0 : (_currenctBalance / depositAmount).toFixed(2);
+        else _interest = 0
+        setCurrecntBalance(_currenctBalance)
+        setInterestEarned(_interestEarned);
+        setInterest(_interest)
+        setWithdrawAmount(_withdrawAmount)
+        setWithdrawStatus(res['data']['data']['withdrawStatus'])
       })
   }
+
+  const log = (arg) => console.log(arg);
 
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showLogIn, setShowLogIn] = useState(false);
   const [publicKey, setPublicKey] = useState('');
+  const [email, setEmail] = useState('')
   const [loginStatus, setLoginStatus] = useState(false);
-  const [depoistAmount, setDepositAmount] = useState(0)
-  const [currentBalance, setCurrentBalance] = useState(0)
-  const [depositType, setDepositType] = useState(false)
+  const [withdrawStatus, setWithdrawStatus] = useState(true)
+  const [currentBalance, setCurrecntBalance] = useState(0);
+  const [interestEarned, setInterestEarned] = useState(0)
+  const [interest, setInterest] = useState(0)
+  const [withdrawAmount, setWithdrawAmount] = useState(0)
+  const [depositType, setDepositType] = useState(false);
+  const [withdrawWallet, setWithdrawWallet] = useState('')
+  const [amountForWithdraw, setAmountForWithdraw] = useState(0)
+  const [spinnerStatus, setSpinner] = useState(false)
   const [data, setData] = useState({
     to: "",
     from: ""
@@ -55,10 +76,17 @@ const Dashboard = () => {
   const hideWithdrawModal = () => { setIsWithdrawOpen(false) };
   const hideSignUpModal = () => { setShowSignUp(false) };
   const hideLogInModal = () => { setShowLogIn(false) };
-  const showSignUpModal = () => { setShowLogIn(false); setShowSignUp(true); }
   const successedLogin = () => { setLoginStatus(true) }
-  const showLogInModal = () => { setShowSignUp(false); setShowLogIn(true); }
-
+  const showSignUpModal = () => { 
+    setShowLogIn(false); 
+    setShowSignUp(true); 
+    setSpinner(false)
+  }
+  const showLogInModal = () => { 
+    setShowSignUp(false); 
+    setShowLogIn(true); 
+    setSpinner(false)
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -91,29 +119,90 @@ const Dashboard = () => {
         return;
       }
       else {
-        console.log(1)
-
+        hideDepositModal();
+        window.open('https://ramp.network/buy/?defaultAsset=USDC', '_blank');
       }
     }
   }
 
-  const getUserInfo = (id, token, userPublicKey, userBalance, user_depositAmount, user_balance) => {
-    console.log(id, userPublicKey,'=======')
-    var base64Url = token.split('.')[1];
+  const Withdraw = () => {
+    if(!loginStatus) {
+      alert('Please log in first')
+      return;
+    } else {
+      if(amountForWithdraw === 0) {
+        alert('Please enter amount to withdraw.')
+        return
+      } else if(amountForWithdraw > currentBalance) {
+        alert('Please enter correct amount') 
+        return 
+      } else {
+        var prefix = withdrawWallet.substring(0, 2)
+        if (prefix !== '0x' || withdrawWallet.length !== 42) {
+          alert('Please enter correct wallet address')
+          return;
+        } else {
+          if(withdrawStatus) {
+            var data = {
+              userID: localStorage.getItem('user_id'),
+              email: email,
+              amount: amountForWithdraw,
+              balance: currentBalance,
+              wallet: withdrawWallet,
+              withdraw: withdrawAmount
+            }
+            axios.post('http://45.153.242.239:5000/api/users/withdraw', data)
+              .then(res => {
+                alert('Your withdrawal request has been sent.')
+                hideWithdrawModal();
+                log(res)
+              })
+          } else {
+            alert(`${amountForWithdraw}USDC is pending withdrawing.\n you can submit further withdrawals once processed`);
+            return
+          }
+        }
+      }
+    }
+  }
+
+  const maxWithdraw = () => {
+    setAmountForWithdraw(currentBalance)
+  }
+
+  const getUserInfo = (userData) => {
+    log(userData)
+    var base64Url = userData['data']['token'].split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
 
-    localStorage.setItem('user_id', id);
-    localStorage.setItem('publicKey', userPublicKey)
+    localStorage.setItem('user_id', userData['data']['user']['id']);
+    localStorage.setItem('publicKey', userData['data']['user']['publicKey'])
     localStorage.setItem('expire', JSON.parse(jsonPayload)['exp'])
-    setPublicKey(userPublicKey);
-    setDepositAmount(user_depositAmount)
-    setCurrentBalance(user_balance)
+    setEmail(userData['data']['user']['email'])
+    setPublicKey(userData['data']['user']['publicKey']);
+    poolValue = userData['data']['user']['totalValue']
+    allocation = userData['data']['user']['allocation'] === undefined ? 0 : userData['data']['user']['allocation']
+    depositAmount = userData['data']['user']['depositAmount'] === undefined ? 0 : userData['data']['user']['depositAmount']
+    _withdrawAmount = userData['data']['user']['withdrawnAmount'] === undefined ? 0: userData['data']['user']['withdrawnAmount']
+    _currenctBalance = (poolValue * allocation).toFixed(2)
+    _interestEarned = (_currenctBalance - depositAmount + _withdrawAmount).toFixed(2)
+    if(_currenctBalance !== (depositAmount - _withdrawAmount).toFixed(2)) _interest = depositAmount === 0 ? 0 : (_currenctBalance / depositAmount).toFixed(2);
+    else _interest = 0
+    setCurrecntBalance(_currenctBalance)
+    setInterestEarned(_interestEarned);
+    setInterest(_interest)
+    setWithdrawAmount(_withdrawAmount)
+    setWithdrawStatus(userData['data']['user']['withdrawStatus'])
+  } 
+
+  const showSpinner = () => {
+    setSpinner(true)
   }
 
-  const signupErrors = (errors) => {
+  const NotificateErrors = (errors) => {
     Object.values(errors).map(function(err) {
       return NotificationManager.warning(
         err,
@@ -121,16 +210,7 @@ const Dashboard = () => {
         3000
       );
     })
-  }
-
-  const loginErrors =(errors) => {
-    Object.values(errors).map(function(err) {
-      return NotificationManager.warning(
-        err,
-        "",
-        3000
-      );
-    })
+    setSpinner(false)
   }
 
   const logout = () => {
@@ -138,8 +218,8 @@ const Dashboard = () => {
     setLoginStatus(false)
   }
 
-  const changePublicKey = () => {
-    console.log(1)
+  const changePublicKey = (e) => {
+    setWithdrawWallet(e.target.value)
   }
 
   return (
@@ -164,13 +244,13 @@ const Dashboard = () => {
               { !loginStatus ?
                 <Form className="d-flex">
                   <main>
-                    <a onClick={() => setShowLogIn(true)}>Log In</a>
-                    <a onClick={() => setShowSignUp(true)}>Sign Up</a>
+                    <a href='#' onClick={() => setShowLogIn(true)}>Log In</a>
+                    <a href='#' onClick={() => setShowSignUp(true)}>Sign Up</a>
                   </main>
                 </Form>
               : <Form className="d-flex">
                   <main>
-                    <a onClick={logout}>Log Out</a>
+                    <a href='#' onClick={logout}>Log Out</a>
                   </main>
                 </Form>
               }
@@ -183,7 +263,7 @@ const Dashboard = () => {
           <div className="row balance">
             <div className="col-lg-6 col-md-6">
               <p>Return</p>
-              <p>31.68%</p>
+              <p>{interest}%</p>
             </div>
             <div className="col-lg-6 col-md-6">
               <p>Balance</p>
@@ -198,7 +278,6 @@ const Dashboard = () => {
               <div className="flex-table header" role="rowgroup">
                 <div className="flex-row first" role="columnheader">Asset/Currency</div>
                 <div className="flex-row" role="columnheader">Price</div>
-                <div className="flex-row" role="columnheader">APY</div>
                 <div className="flex-row" role="columnheader">Balance</div>
                 <div className="flex-row" role="columnheader">Total Interest earned</div>
               </div>
@@ -206,9 +285,8 @@ const Dashboard = () => {
                 <div className="flex-row first" role="cell">
                   <img src={icon} alt="usdc icon" /> stablecoin</div>
                 <div className="flex-row" role="cell">$1</div>
-                <div className="flex-row" role="cell">6%</div>
                 <div className="flex-row" role="cell">{currentBalance} USDC</div>
-                <div className="flex-row" role="cell">{currentBalance-depoistAmount} USDC</div>
+                <div className="flex-row" role="cell">{interestEarned} USDC</div>
               </div>
             </div>
           </div>
@@ -224,7 +302,7 @@ const Dashboard = () => {
                 <div className="flex-row-1 first" role="cell">
                   <img src={icon} alt="usdc icon" /> Stable Strategy</div>
                 <div className="flex-row-1" role="cell">8~12%</div>
-                <div className="flex-row-1" role="cell">0.04484529 USDC</div>
+                <div className="flex-row-1" role="cell">{currentBalance} USDC</div>
               </div>
             </div>
           </div>
@@ -279,29 +357,31 @@ const Dashboard = () => {
             </Form.Group>
             <Form.Group>
               <Form.Label>Current Balance</Form.Label><br></br>
-              <Form.Label style={{fontSize: "25px"}}>3948 USDC</Form.Label>
+              <Form.Label style={{fontSize: "25px"}}>{currentBalance} USDC</Form.Label>
             </Form.Group>
             <InputGroup>
-              <Form.Control aria-label="Dollar amount (with dot and two decimal places)" />
+              <Form.Control aria-label="Dollar amount (with dot and two decimal places)" value={amountForWithdraw} onChange={(e) => setAmountForWithdraw(e.target.value)} />
               <InputGroup.Text>USDC</InputGroup.Text>
-              <Button variant="outline-secondary">MAX</Button>
+              <Button variant="outline-secondary" onClick={maxWithdraw}>MAX</Button>
             </InputGroup>
             <Form.Group>
               <Form.Label>Wallet Address</Form.Label>
-              <Form.Control type="text" value={publicKey} placeholder="ROC wallet address" />
+              <Form.Control type="text" onChange={changePublicKey}/>
+              <Form.Label>Withdraw fee is 0.2 USDC</Form.Label>
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button bsstyle='danger' onClick={hideWithdrawModal}>Cancel</Button>
-          <Button>Withdraw</Button>
+          <Button onClick={Withdraw}>Withdraw</Button>
         </Modal.Footer>
       </Modal>
       <SignUp 
         showModal={showSignUp}
         hideModal={hideSignUpModal}
         logInModal={showLogInModal}
-        errors={signupErrors}
+        errors={NotificateErrors}
+        spinner={showSpinner}
       />
       <Login 
         showModal={showLogIn}
@@ -309,9 +389,16 @@ const Dashboard = () => {
         signUpModal={showSignUpModal}
         successLog={successedLogin}
         userInfo={getUserInfo}
-        errors={loginErrors}
+        errors={NotificateErrors}
+        spinner={showSpinner}
       />
       <NotificationContainer />
+      {
+        spinnerStatus ?
+        <Spinner />
+        :
+        <></>
+      }
     </>
   )
 }

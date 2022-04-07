@@ -53,7 +53,7 @@ img {
   text-align: left;
 }
 .flex-row {
-  width: 20%;
+  width: 25%;
 }
 .flex-row-1 {
   width: 33.33333%;
@@ -87,4 +87,9 @@ img {
 main a{
   padding: 20px;
   cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: white;
 }

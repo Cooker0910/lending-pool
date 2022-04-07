@@ -20,13 +20,14 @@ const SignUp = (props) => {
   }
 
   const register = () => {
-
+    props.spinner()
     axios.post("http://localhost:5000/api/users/register", {
       ...user,
     })
     .then(res => {
       console.log(res)
       props.logInModal();
+      
     })
     .catch(err => props.errors(err.response.data))
   }
