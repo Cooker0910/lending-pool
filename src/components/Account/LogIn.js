@@ -19,15 +19,18 @@ const Login = (props) => {
   }
 
   const login = () => {
+    props.showSpinner()
     axios.post("http://localhost:5000/api/users/login", user)
     .then((res) => {
       console.log(res)
       props.userInfo(res)
       props.successLog();
       props.hideModal();
+      props.hideSpinner();
     })
     .catch(err => {
       console.log(err)
+      props.hideSpinner();
       props.errors(err.response.data)
     });
   }

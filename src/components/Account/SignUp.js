@@ -20,16 +20,19 @@ const SignUp = (props) => {
   }
 
   const register = () => {
-    props.spinner()
+    props.showSpinner()
     axios.post("http://localhost:5000/api/users/register", {
       ...user,
     })
     .then(res => {
       console.log(res)
       props.logInModal();
-      
+      props.hideSpinner();
     })
-    .catch(err => props.errors(err.response.data))
+    .catch(err => {
+      props.hideSpinner();
+      props.errors(err.response.data)
+    })
   }
 
   return (

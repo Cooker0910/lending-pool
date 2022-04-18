@@ -1,19 +1,66 @@
+.left {
+  width: 100px;
+  position: fixed;
+  background: #172566;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: 10;
+}
+.left .container {
+  padding: 17px;
+}
+.top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #cccccc;
+}
+.content-one {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #003060;
+  padding: 8rem 12rem 3rem 15rem;
+}
 .balance {
+  width: 100%;
   font-size: 35px;
   font-weight: 700;
   padding-bottom: 40px;
   text-align: left;
+  color: white;
+}
+.details {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5rem 12rem 3rem 15rem;
 }
 img {
   width: 37px;
 }
+.logo {
+  width: 60px;
+  display: block;
+}
 .assets {
   padding-top: 40px;
+  margin: 0;
 }
 .dropdown {
   cursor: pointer;
   display: inline-block;
   position: relative;
+}
+main button {
+  color: rgb(0, 140, 255);
+  background-color: unset;
+  border: unset;
+}
+main button:hover {
+  color: rgb(0, 140, 255);
 }
 .button {
   font-size: 25px;
@@ -36,27 +83,26 @@ img {
   margin: unset!important;
 }
 .flex-table {
-  border: 1px solid #eee;
   display: flex;
   flex-flow: row wrap;
   margin: 10px;
   padding: 10px;
   transition: .5s;
 }
-.flex-table:first-of-type .flex-row {
-  color: #fff;
-}
-
 .flex-row, .flex-row-1 {
-  font-size: 20px;
+  font-size: 18px;
   padding: 0.7em;
-  text-align: left;
+  text-align: right;
 }
-.flex-row {
-  width: 25%;
+.flex-row, .flex-row-1 {
+  width: 20%;
 }
-.flex-row-1 {
-  width: 33.33333%;
+.flex-row:first-of-type, .flex-row-1:first-of-type {
+  text-align: left !important;
+  width: 30%;
+}
+.flex-row:last-of-type {
+  width: 30%;
 }
 .modal-dialog {
   color: black !important;
@@ -77,18 +123,11 @@ img {
 .navbar-brand {
   color: white !important;
 }
-.content-Center {
-  padding : var(--bs-gutter-x,6rem)!important;
-  display: flex;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-}
+
 main a{
   padding: 20px;
   cursor: pointer;
 }
-
 a {
   text-decoration: none;
   color: white;

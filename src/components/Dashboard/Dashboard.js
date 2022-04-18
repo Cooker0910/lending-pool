@@ -5,14 +5,15 @@ import {NotificationContainer,  NotificationManager} from "react-notifications";
 import './dashboard.css';
 import "react-notifications/lib/notifications.css";
 import axios from "axios";
+import copy from "copy-to-clipboard";  
 import Modal from "react-bootstrap/Modal";
 import SignUp from '../Account/SignUp';
 import Login from '../Account/LogIn';
-import Spinner from '../Spinner/Spinner';
 import icon from '../../assets/usdc-coin.png';
+import logo from '../../assets/logo.jpg'
 let poolValue = 0 ,allocation = 0, depositAmount = 0, _currenctBalance = 0, _interestEarned = 0, _interest = 0, _withdrawAmount = 0;
 
-const Dashboard = () => {
+const Dashboard = (props) => {
   
   useEffect(() => {
     let expire = localStorage.getItem('expire')
@@ -23,27 +24,26 @@ const Dashboard = () => {
     if(localStorage.getItem('user_id') != null) {
       getUserData(localStorage.getItem('user_id'))
     }
-    log(email)
   }, [])
 
   const getUserData = (id) => {
-    axios.get('http://45.153.242.239:5000/api/users/' + id)
+    axios.get('http://localhost:5000/api/users/' + id)
       .then(res => {
-        log(res)
         setEmail(res['data']['data']['email'])
         allocation = res['data']['data']['allocation'] === undefined ? 0 : res['data']['data']['allocation'];
         poolValue = res['data']['totalValue']
         depositAmount = res['data']['data']['depositAmount'] === undefined ? 0 : res['data']['data']['depositAmount']
         _withdrawAmount = res['data']['data']['withdrawnAmount'] === undefined ? 0: res['data']['data']['withdrawnAmount']
-        _currenctBalance = (poolValue * allocation).toFixed(2)
+        _currenctBalance = (poolValue * allocation).toFixed(2) < (depositAmount - _withdrawAmount) ? (depositAmount - _withdrawAmount) : (poolValue * allocation).toFixed(2)
         _interestEarned = (_currenctBalance - depositAmount + _withdrawAmount).toFixed(2)
-        if(_currenctBalance !== (depositAmount - _withdrawAmount).toFixed(2)) _interest = depositAmount === 0 ? 0 : (_currenctBalance / depositAmount).toFixed(2);
+        if(_currenctBalance > (depositAmount - _withdrawAmount).toFixed(2)) _interest = depositAmount === 0 ? 0 : ((_currenctBalance - depositAmount) * 100 / depositAmount).toFixed(2);
         else _interest = 0
         setCurrecntBalance(_currenctBalance)
         setInterestEarned(_interestEarned);
         setInterest(_interest)
         setWithdrawAmount(_withdrawAmount)
         setWithdrawStatus(res['data']['data']['withdrawStatus'])
+        console.log(poolValue)
       })
   }
 
@@ -64,7 +64,6 @@ const Dashboard = () => {
   const [depositType, setDepositType] = useState(false);
   const [withdrawWallet, setWithdrawWallet] = useState('')
   const [amountForWithdraw, setAmountForWithdraw] = useState(0)
-  const [spinnerStatus, setSpinner] = useState(false)
   const [data, setData] = useState({
     to: "",
     from: ""
@@ -80,12 +79,12 @@ const Dashboard = () => {
   const showSignUpModal = () => { 
     setShowLogIn(false); 
     setShowSignUp(true); 
-    setSpinner(false)
+    props.spinner(false)
   }
   const showLogInModal = () => { 
     setShowSignUp(false); 
     setShowLogIn(true); 
-    setSpinner(false)
+    props.spinner(false)
   }
 
   const handleChange = (e) => {
@@ -151,7 +150,7 @@ const Dashboard = () => {
               wallet: withdrawWallet,
               withdraw: withdrawAmount
             }
-            axios.post('http://45.153.242.239:5000/api/users/withdraw', data)
+            axios.post('http://localhost:5000/api/users/withdraw', data)
               .then(res => {
                 alert('Your withdrawal request has been sent.')
                 hideWithdrawModal();
@@ -171,7 +170,6 @@ const Dashboard = () => {
   }
 
   const getUserInfo = (userData) => {
-    log(userData)
     var base64Url = userData['data']['token'].split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
@@ -187,9 +185,10 @@ const Dashboard = () => {
     allocation = userData['data']['user']['allocation'] === undefined ? 0 : userData['data']['user']['allocation']
     depositAmount = userData['data']['user']['depositAmount'] === undefined ? 0 : userData['data']['user']['depositAmount']
     _withdrawAmount = userData['data']['user']['withdrawnAmount'] === undefined ? 0: userData['data']['user']['withdrawnAmount']
-    _currenctBalance = (poolValue * allocation).toFixed(2)
+    _currenctBalance = (poolValue * allocation).toFixed(2) < (depositAmount - _withdrawAmount) ? (depositAmount - _withdrawAmount) : (poolValue * allocation).toFixed(2)
     _interestEarned = (_currenctBalance - depositAmount + _withdrawAmount).toFixed(2)
-    if(_currenctBalance !== (depositAmount - _withdrawAmount).toFixed(2)) _interest = depositAmount === 0 ? 0 : (_currenctBalance / depositAmount).toFixed(2);
+    console.log(depositAmount, _withdrawAmount, _currenctBalance, _interestEarned)
+    if(_currenctBalance > (depositAmount - _withdrawAmount).toFixed(2)) _interest = depositAmount === 0 ? 0 : ((_currenctBalance - depositAmount) * 100 / depositAmount).toFixed(2);
     else _interest = 0
     setCurrecntBalance(_currenctBalance)
     setInterestEarned(_interestEarned);
@@ -198,9 +197,8 @@ const Dashboard = () => {
     setWithdrawStatus(userData['data']['user']['withdrawStatus'])
   } 
 
-  const showSpinner = () => {
-    setSpinner(true)
-  }
+  const showSpinner = () => { props.spinner(true) }
+  const hideSpinner = () => { props.spinner(false) }
 
   const NotificateErrors = (errors) => {
     Object.values(errors).map(function(err) {
@@ -210,12 +208,22 @@ const Dashboard = () => {
         3000
       );
     })
-    setSpinner(false)
+    props.spinner(false)
   }
 
   const logout = () => {
     localStorage.clear();
     setLoginStatus(false)
+  }
+
+  const copyPublickKey = () => {
+    console.log(localStorage.getItem('publicKey'), 'hjhjkhkjhk')
+    copy(localStorage.getItem('publicKey'))
+    return NotificationManager.warning(
+      'Copied',
+      "",
+      3000
+    );
   }
 
   const changePublicKey = (e) => {
@@ -224,15 +232,17 @@ const Dashboard = () => {
 
   return (
     <>
-      <div>
+      <div className='left'>
+        <Container>
+          <Navbar.Brand href="#">
+            <img src={logo} alt="logo" className='logo' />
+            ROC
+          </Navbar.Brand>
+        </Container>
+      </div>
+      <div className='top'>
         <Navbar>
           <Container fluid>
-            <Navbar.Brand href="#">
-              {/* <img
-                alt="logo"
-              /> */}
-              ROC Finance
-            </Navbar.Brand>
             <Navbar.Toggle aria-controls="navbarScroll" />
             <Navbar.Collapse id="navbarScroll">
               <Nav
@@ -244,13 +254,13 @@ const Dashboard = () => {
               { !loginStatus ?
                 <Form className="d-flex">
                   <main>
-                    <a href='#' onClick={() => setShowLogIn(true)}>Log In</a>
-                    <a href='#' onClick={() => setShowSignUp(true)}>Sign Up</a>
+                    <button onClick={() => setShowLogIn(true)}>Log In</button>
+                    <button onClick={() => setShowSignUp(true)}>Sign Up</button>
                   </main>
                 </Form>
               : <Form className="d-flex">
                   <main>
-                    <a href='#' onClick={logout}>Log Out</a>
+                    <button onClick={logout}>Log Out</button>
                   </main>
                 </Form>
               }
@@ -258,8 +268,8 @@ const Dashboard = () => {
           </Container>
         </Navbar>
       </div>
-      <div className='d-flex flex-column-fluid content-Center'>
-        <div className="container-fluid">
+      <div className="content-one">
+        <div className='container'>
           <div className="row balance">
             <div className="col-lg-6 col-md-6">
               <p>Return</p>
@@ -272,7 +282,11 @@ const Dashboard = () => {
               <div className="dropdown"><HiMinusSm /><span className='button' onClick={showWithdrawModal}>Withdraw</span></div>
             </div>
           </div>
-          <div className="row assets col-xl-12">
+        </div>
+      </div>
+      <div className='details'>
+        <div className='container'>
+          <div className="row assets">
             <p>Assets you own</p>
             <div className="table-container" role="table" aria-label="Destinations">
               <div className="flex-table header" role="rowgroup">
@@ -283,14 +297,14 @@ const Dashboard = () => {
               </div>
               <div className="flex-table row" role="rowgroup">
                 <div className="flex-row first" role="cell">
-                  <img src={icon} alt="usdc icon" /> stablecoin</div>
+                  <img src={icon} alt="usdc icon" /> Stable Strategy</div>
                 <div className="flex-row" role="cell">$1</div>
                 <div className="flex-row" role="cell">{currentBalance} USDC</div>
                 <div className="flex-row" role="cell">{interestEarned} USDC</div>
               </div>
             </div>
           </div>
-          <div className="row assets col-xl-12">
+          <div className="row assets">
             <p>Risk strategies</p>
             <div className="table-container" role="table" aria-label="Destinations">
               <div className="flex-table header" role="rowgroup">
@@ -300,7 +314,7 @@ const Dashboard = () => {
               </div>
               <div className="flex-table row" role="rowgroup">
                 <div className="flex-row-1 first" role="cell">
-                  <img src={icon} alt="usdc icon" /> Stable Strategy</div>
+                  <img src={icon} alt="usdc icon" /> Stable Strategies</div>
                 <div className="flex-row-1" role="cell">8~12%</div>
                 <div className="flex-row-1" role="cell">{currentBalance} USDC</div>
               </div>
@@ -333,7 +347,10 @@ const Dashboard = () => {
             </Form.Group>
             <Form.Group>
               <Form.Label>Wallet Address</Form.Label>
-              <Form.Control type="text" placeholder="ROC wallet address" value={publicKey} onChange={changePublicKey} />
+              <InputGroup>
+                <Form.Control type="text" placeholder="ROC wallet address" value={publicKey} onChange={changePublicKey} />
+                <Button variant="outline-dark" onClick={copyPublickKey}>Copy</Button>
+              </InputGroup>
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -381,7 +398,8 @@ const Dashboard = () => {
         hideModal={hideSignUpModal}
         logInModal={showLogInModal}
         errors={NotificateErrors}
-        spinner={showSpinner}
+        showSpinner={showSpinner}
+        hideSpinner={hideSpinner}
       />
       <Login 
         showModal={showLogIn}
@@ -390,15 +408,10 @@ const Dashboard = () => {
         successLog={successedLogin}
         userInfo={getUserInfo}
         errors={NotificateErrors}
-        spinner={showSpinner}
+        showSpinner={showSpinner}
+        hideSpinner={hideSpinner}
       />
       <NotificationContainer />
-      {
-        spinnerStatus ?
-        <Spinner />
-        :
-        <></>
-      }
     </>
   )
 }

@@ -6,6 +6,10 @@
   top: 0;
   height: 100%;
   position: fixed;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  z-index: 1111111;
 }
 .dots-bars-4 {
   width: 40px;
