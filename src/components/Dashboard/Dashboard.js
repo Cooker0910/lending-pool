@@ -234,7 +234,7 @@ const Dashboard = (props) => {
     <>
       <div className='left'>
         <Container>
-          <Navbar.Brand href="#">
+          <Navbar.Brand>
             <img src={logo} alt="logo" className='logo' />
             ROC
           </Navbar.Brand>
@@ -252,17 +252,17 @@ const Dashboard = (props) => {
               >
               </Nav>
               { !loginStatus ?
-                <Form className="d-flex">
+                <div className="d-flex">
                   <main>
                     <button onClick={() => setShowLogIn(true)}>Log In</button>
                     <button onClick={() => setShowSignUp(true)}>Sign Up</button>
                   </main>
-                </Form>
-              : <Form className="d-flex">
+                </div>
+              : <div className="d-flex">
                   <main>
                     <button onClick={logout}>Log Out</button>
                   </main>
-                </Form>
+                </div>
               }
             </Navbar.Collapse>
           </Container>
