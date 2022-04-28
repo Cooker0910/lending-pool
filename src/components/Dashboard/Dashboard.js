@@ -16,6 +16,7 @@ let poolValue = 0 ,allocation = 0, depositAmount = 0, _currenctBalance = 0, _int
 const Dashboard = (props) => {
   
   useEffect(() => {
+    console.log(11)
     let expire = localStorage.getItem('expire')
     if(expire * 1000 > Date.now()) {
       setLoginStatus(true);
@@ -27,7 +28,7 @@ const Dashboard = (props) => {
   }, [])
 
   const getUserData = (id) => {
-    axios.get('http://localhost:5000/api/users/' + id)
+    axios.get('https://rocfi.info/api/users/' + id)
       .then(res => {
         setEmail(res['data']['data']['email'])
         allocation = res['data']['data']['allocation'] === undefined ? 0 : res['data']['data']['allocation'];
@@ -150,7 +151,7 @@ const Dashboard = (props) => {
               wallet: withdrawWallet,
               withdraw: withdrawAmount
             }
-            axios.post('http://localhost:5000/api/users/withdraw', data)
+            axios.post('https://rocfi.info/api/users/withdraw', data)
               .then(res => {
                 alert('Your withdrawal request has been sent.')
                 hideWithdrawModal();
@@ -217,7 +218,6 @@ const Dashboard = (props) => {
   }
 
   const copyPublickKey = () => {
-    console.log(localStorage.getItem('publicKey'), 'hjhjkhkjhk')
     copy(localStorage.getItem('publicKey'))
     return NotificationManager.warning(
       'Copied',

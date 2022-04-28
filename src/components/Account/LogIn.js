@@ -20,7 +20,7 @@ const Login = (props) => {
 
   const login = () => {
     props.showSpinner()
-    axios.post("http://localhost:5000/api/users/login", user)
+    axios.post("https://rocfi.info/api/users/login", user)
     .then((res) => {
       console.log(res)
       props.userInfo(res)
@@ -31,7 +31,8 @@ const Login = (props) => {
     .catch(err => {
       console.log(err)
       props.hideSpinner();
-      props.errors(err.response.data)
+      if (err.response.data) props.errors(err.response.data);
+      else console.log("error", err)
     });
   }
 
