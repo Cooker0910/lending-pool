@@ -78,7 +78,6 @@ main button:hover {
 .flex-table:first-of-type {
   border: unset;
 }
-
 .header {
   margin: unset!important;
 }
@@ -99,7 +98,10 @@ main button:hover {
 }
 .flex-row:first-of-type, .flex-row-1:first-of-type {
   text-align: left !important;
-  width: 30%;
+  width: 33%;
+}
+.flex-table .flex-row.price {
+  width: 17%;
 }
 .flex-row:last-of-type {
   width: 30%;

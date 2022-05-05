@@ -11,6 +11,7 @@ import SignUp from '../Account/SignUp';
 import Login from '../Account/LogIn';
 import icon from '../../assets/usdc-coin.png';
 import logo from '../../assets/logo.jpg'
+import estate from '../../assets/estate.png'
 let poolValue = 0 ,allocation = 0, depositAmount = 0, _currenctBalance = 0, _interestEarned = 0, _interest = 0, _withdrawAmount = 0;
 
 const Dashboard = (props) => {
@@ -291,14 +292,21 @@ const Dashboard = (props) => {
             <div className="table-container" role="table" aria-label="Destinations">
               <div className="flex-table header" role="rowgroup">
                 <div className="flex-row first" role="columnheader">Asset/Currency</div>
-                <div className="flex-row" role="columnheader">Price</div>
+                <div className="flex-row price" role="columnheader">Price</div>
                 <div className="flex-row" role="columnheader">Balance</div>
                 <div className="flex-row" role="columnheader">Total Interest earned</div>
               </div>
               <div className="flex-table row" role="rowgroup">
                 <div className="flex-row first" role="cell">
                   <img src={icon} alt="usdc icon" /> Stable Strategy</div>
-                <div className="flex-row" role="cell">$1</div>
+                <div className="flex-row price" role="cell">$1</div>
+                <div className="flex-row" role="cell">{currentBalance} USDC</div>
+                <div className="flex-row" role="cell">{interestEarned} USDC</div>
+              </div>
+              <div className="flex-table row" role="rowgroup">
+                <div className="flex-row first" role="cell">
+                  <img src={estate} alt="usdc icon" /> Real Estate Strategy</div>
+                <div className="flex-row price" role="cell"></div>
                 <div className="flex-row" role="cell">{currentBalance} USDC</div>
                 <div className="flex-row" role="cell">{interestEarned} USDC</div>
               </div>
