@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {HiPlusSm, HiMinusSm} from 'react-icons/hi'
-import { Navbar, Nav, Container, Form, Button, InputGroup } from "react-bootstrap";
+import { Navbar, Nav, Container, Form, Button, InputGroup, Dropdown, DropdownButton } from "react-bootstrap";
 import {NotificationContainer,  NotificationManager} from "react-notifications";
 import './dashboard.css';
 import "react-notifications/lib/notifications.css";
@@ -231,6 +231,12 @@ const Dashboard = (props) => {
     setWithdrawWallet(e.target.value)
   }
 
+  const [value,setValue]=useState('');
+  const handleSelect=(e)=>{
+    console.log(e);
+    setValue(e)
+  }
+
   return (
     <>
       <div className='left'>
@@ -329,6 +335,19 @@ const Dashboard = (props) => {
             </div>
           </div>
         </div>
+      </div>
+      <div className="App container">
+        <DropdownButton
+          alignRight
+          title="Deposit Type"
+          id="dropdown-menu-align-right"
+          onSelect={handleSelect}
+          >
+            <Dropdown.Item eventKey="0x0102b5296D12327111c231C864Af078FdEef2Ade">Polygon</Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item eventKey="0x85A4602B2248745148e453Aa28fcD6f7d8d80674">Gnosis</Dropdown.Item>
+        </DropdownButton>
+        <span> Main Pool Address: {value}</span>
       </div>
       <Modal
         show={isDepositOpen}
