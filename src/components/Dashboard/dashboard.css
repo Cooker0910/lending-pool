@@ -98,13 +98,16 @@ main button:hover {
 }
 .flex-row:first-of-type, .flex-row-1:first-of-type {
   text-align: left !important;
-  width: 33%;
+  width: 35%;
 }
-.flex-table .flex-row.price {
-  width: 17%;
+.flex-table .flex-row.balance1 {
+  width: 12%;
 }
-.flex-row:last-of-type {
-  width: 30%;
+.flex-table .flex-row.type {
+  width: 24%;
+}
+.flex-table .flex-row.interest {
+  width: 29%;
 }
 .modal-dialog {
   color: black !important;

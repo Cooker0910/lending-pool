@@ -66,6 +66,7 @@ const Dashboard = (props) => {
   const [depositType, setDepositType] = useState(false);
   const [withdrawWallet, setWithdrawWallet] = useState('')
   const [amountForWithdraw, setAmountForWithdraw] = useState(0)
+  const [mainAddr, setMainAddr] = useState('')
   const [data, setData] = useState({
     to: "",
     from: ""
@@ -285,8 +286,6 @@ const Dashboard = (props) => {
             <div className="col-lg-6 col-md-6">
               <p>Balance</p>
               <p>${currentBalance}</p>
-              <div className="dropdown"><HiPlusSm /><span className='button' onClick={showDepositModal}>Deposit </span></div>
-              <div className="dropdown"><HiMinusSm /><span className='button' onClick={showWithdrawModal}>Withdraw</span></div>
             </div>
           </div>
         </div>
@@ -298,23 +297,29 @@ const Dashboard = (props) => {
             <div className="table-container" role="table" aria-label="Destinations">
               <div className="flex-table header" role="rowgroup">
                 <div className="flex-row first" role="columnheader">Asset/Currency</div>
-                <div className="flex-row price" role="columnheader">Price</div>
-                <div className="flex-row" role="columnheader">Balance</div>
-                <div className="flex-row" role="columnheader">Total Interest earned</div>
+                <div className="flex-row balance1" role="columnheader">Balance</div>
+                <div className="flex-row interest" role="columnheader">Total Interest earned</div>
+                <div className="flex-row type" role="columnheader">Deposit / Withdraw</div>
               </div>
               <div className="flex-table row" role="rowgroup">
                 <div className="flex-row first" role="cell">
                   <img src={icon} alt="usdc icon" /> Stable Strategy</div>
-                <div className="flex-row price" role="cell">$1</div>
-                <div className="flex-row" role="cell">{currentBalance} USDC</div>
-                <div className="flex-row" role="cell">{interestEarned} USDC</div>
+                <div className="flex-row balance1" role="cell">{currentBalance} USDC</div>
+                <div className="flex-row interest" role="cell">{interestEarned} USDC</div>
+                <div className='flex-row type' role='columnheader'>
+                  <button className='btn' onClick={() => {showDepositModal(); setMainAddr('0x0102b5296D12327111c231C864Af078FdEef2Ade')}}><HiPlusSm /></button>
+                  <button className='btn' onClick={showWithdrawModal}><HiMinusSm /></button>
+                </div>
               </div>
               <div className="flex-table row" role="rowgroup">
                 <div className="flex-row first" role="cell">
                   <img src={estate} alt="usdc icon" /> Real Estate Strategy</div>
-                <div className="flex-row price" role="cell"></div>
-                <div className="flex-row" role="cell">{currentBalance} USDC</div>
-                <div className="flex-row" role="cell">{interestEarned} USDC</div>
+                <div className="flex-row balance1" role="cell">{currentBalance} USDC</div>
+                <div className="flex-row interest" role="cell">{interestEarned} USDC</div>
+                <div className='flex-row type' role='columnheader'>
+                  <button className='btn' onClick={() => {showDepositModal(); setMainAddr('0x85A4602B2248745148e453Aa28fcD6f7d8d80674')}}><HiPlusSm /></button>
+                  <button className='btn' onClick={showWithdrawModal}><HiMinusSm /></button>
+                </div>
               </div>
             </div>
           </div>
@@ -335,19 +340,6 @@ const Dashboard = (props) => {
             </div>
           </div>
         </div>
-      </div>
-      <div className="App container">
-        <DropdownButton
-          alignRight
-          title="Deposit Type"
-          id="dropdown-menu-align-right"
-          onSelect={handleSelect}
-          >
-            <Dropdown.Item eventKey="0x0102b5296D12327111c231C864Af078FdEef2Ade">Polygon</Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item eventKey="0x85A4602B2248745148e453Aa28fcD6f7d8d80674">Gnosis</Dropdown.Item>
-        </DropdownButton>
-        <span> Main Pool Address: {value}</span>
       </div>
       <Modal
         show={isDepositOpen}
@@ -379,6 +371,7 @@ const Dashboard = (props) => {
                 <Button variant="outline-dark" onClick={copyPublickKey}>Copy</Button>
               </InputGroup>
             </Form.Group>
+            <Form.Label>Main Pool Address: {mainAddr}</Form.Label>
           </Form>
         </Modal.Body>
         <Modal.Footer>
