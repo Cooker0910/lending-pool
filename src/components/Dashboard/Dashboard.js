@@ -29,11 +29,12 @@ const Dashboard = (props) => {
   }, [])
 
   const getUserData = (id) => {
-    axios.get('https://rocfi.info/api/users/' + id)
+    axios.get('http://localhost:5000/api/users/' + id)
       .then(res => {
+        console.log(res)
         setEmail(res['data']['data']['email'])
         allocation = res['data']['data']['allocation'] === undefined ? 0 : res['data']['data']['allocation'];
-        poolValue = res['data']['totalValue']
+        poolValue = res['data']['totalValue']['polValue']
         depositAmount = res['data']['data']['depositAmount'] === undefined ? 0 : res['data']['data']['depositAmount']
         _withdrawAmount = res['data']['data']['withdrawnAmount'] === undefined ? 0: res['data']['data']['withdrawnAmount']
         _currenctBalance = (poolValue * allocation).toFixed(2) < (depositAmount - _withdrawAmount) ? (depositAmount - _withdrawAmount) : (poolValue * allocation).toFixed(2)
@@ -153,7 +154,7 @@ const Dashboard = (props) => {
               wallet: withdrawWallet,
               withdraw: withdrawAmount
             }
-            axios.post('https://rocfi.info/api/users/withdraw', data)
+            axios.post('http://localhost:5000/api/users/withdraw', data)
               .then(res => {
                 alert('Your withdrawal request has been sent.')
                 hideWithdrawModal();
@@ -184,7 +185,7 @@ const Dashboard = (props) => {
     localStorage.setItem('expire', JSON.parse(jsonPayload)['exp'])
     setEmail(userData['data']['user']['email'])
     setPublicKey(userData['data']['user']['publicKey']);
-    poolValue = userData['data']['user']['totalValue']
+    poolValue = userData['data']['user']['totalValue']['polValue']
     allocation = userData['data']['user']['allocation'] === undefined ? 0 : userData['data']['user']['allocation']
     depositAmount = userData['data']['user']['depositAmount'] === undefined ? 0 : userData['data']['user']['depositAmount']
     _withdrawAmount = userData['data']['user']['withdrawnAmount'] === undefined ? 0: userData['data']['user']['withdrawnAmount']
