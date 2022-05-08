@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {HiPlusSm, HiMinusSm} from 'react-icons/hi'
-import { Navbar, Nav, Container, Form, Button, InputGroup, Dropdown, DropdownButton } from "react-bootstrap";
+import { Navbar, Nav, Container, Form, Button, InputGroup } from "react-bootstrap";
 import {NotificationContainer,  NotificationManager} from "react-notifications";
 import './dashboard.css';
 import "react-notifications/lib/notifications.css";
@@ -12,12 +12,14 @@ import Login from '../Account/LogIn';
 import icon from '../../assets/usdc-coin.png';
 import logo from '../../assets/logo.jpg'
 import estate from '../../assets/estate.png'
-let poolValue = 0 ,allocation = 0, depositAmount = 0, _currenctBalance = 0, _interestEarned = 0, _interest = 0, _withdrawAmount = 0;
+let usdcValue = 0, realtValue = 0, gnosisValue = 0, gcValue;
+let allocation1 = 0, depositAmount1 = 0, _currenctBalance1 = 0, _interest1Earned1 = 0, _interest1 = 0, _withdrawAmount1 = 0;
+let allocation2 = 0, depositAmount2 = 0, _currenctBalance2 = 0, _interest1Earned2 = 0, _interest2 = 0, _withdrawAmount2 = 0;
+let withdrawAmount = 0;
 
 const Dashboard = (props) => {
   
   useEffect(() => {
-    console.log(11)
     let expire = localStorage.getItem('expire')
     if(expire * 1000 > Date.now()) {
       setLoginStatus(true);
@@ -33,20 +35,32 @@ const Dashboard = (props) => {
       .then(res => {
         console.log(res)
         setEmail(res['data']['data']['email'])
-        allocation = res['data']['data']['allocation'] === undefined ? 0 : res['data']['data']['allocation'];
-        poolValue = res['data']['totalValue']['polValue']
-        depositAmount = res['data']['data']['depositAmount'] === undefined ? 0 : res['data']['data']['depositAmount']
-        _withdrawAmount = res['data']['data']['withdrawnAmount'] === undefined ? 0: res['data']['data']['withdrawnAmount']
-        _currenctBalance = (poolValue * allocation).toFixed(2) < (depositAmount - _withdrawAmount) ? (depositAmount - _withdrawAmount) : (poolValue * allocation).toFixed(2)
-        _interestEarned = (_currenctBalance - depositAmount + _withdrawAmount).toFixed(2)
-        if(_currenctBalance > (depositAmount - _withdrawAmount).toFixed(2)) _interest = depositAmount === 0 ? 0 : ((_currenctBalance - depositAmount) * 100 / depositAmount).toFixed(2);
-        else _interest = 0
-        setCurrecntBalance(_currenctBalance)
-        setInterestEarned(_interestEarned);
-        setInterest(_interest)
-        setWithdrawAmount(_withdrawAmount)
-        setWithdrawStatus(res['data']['data']['withdrawStatus'])
-        console.log(poolValue)
+        allocation1 = res['data']['data']['allocation1'] === undefined ? 0 : res['data']['data']['allocation1'];
+        allocation2 = res['data']['data']['allocation2'] === undefined ? 0 : res['data']['data']['allocation2'];
+        usdcValue = res['data']['totalValue']['usdcValue'] + res['data']['totalValue']['investAmount']
+        realtValue = res['data']['totalValue']['realtValue']
+        gnosisValue = res['data']['totalValue']['gnosisValue']
+        gcValue = realtValue + gnosisValue
+        depositAmount1 = res['data']['data']['depositAmount1'] === undefined ? 0 : res['data']['data']['depositAmount1']
+        depositAmount2 = res['data']['data']['depositAmount2'] === undefined ? 0 : res['data']['data']['depositAmount2']
+        _withdrawAmount1 = res['data']['data']['withdrawnAmount1'] === undefined ? 0: res['data']['data']['withdrawnAmount1']
+        _withdrawAmount2 = res['data']['data']['withdrawnAmount2'] === undefined ? 0: res['data']['data']['withdrawnAmount2']
+        console.log((gcValue * allocation2).toFixed(2), '-----------')
+        _currenctBalance1 = (usdcValue * allocation1).toFixed(2) < (depositAmount1 - _withdrawAmount1) ? (depositAmount1 - _withdrawAmount1) : (usdcValue * allocation1).toFixed(2)
+        _currenctBalance2 = (gcValue * allocation2).toFixed(2) < (depositAmount2 - _withdrawAmount2) ? (depositAmount2 - _withdrawAmount2) : (gcValue * allocation2).toFixed(2)
+        _interest1Earned1 = (_currenctBalance1 - depositAmount1 + _withdrawAmount1).toFixed(2)
+        _interest1Earned2 = (_currenctBalance2 - depositAmount2 + _withdrawAmount2).toFixed(2)
+        if(_currenctBalance1 > (depositAmount1 - _withdrawAmount1).toFixed(2)) _interest1 = depositAmount1 === 0 ? 0 : ((_currenctBalance1 - depositAmount1) * 100 / depositAmount1).toFixed(2);
+        else _interest1 = 0
+        if(_currenctBalance2 > (depositAmount2 - _withdrawAmount2).toFixed(2)) _interest2 = depositAmount2 === 0 ? 0 : ((_currenctBalance2 - depositAmount2) * 100 / depositAmount2).toFixed(2);
+        else _interest2 = 0
+        setCurrecntBalance(Number(_currenctBalance1) + Number(_currenctBalance2))
+        setInterestEarned(Number(_interest1Earned1) + Number(_interest1Earned2));
+        setInterest(Number(_interest1) + Number(_interest2))
+        setWithdrawAmount1(_withdrawAmount1)
+        setWithdrawAmount2(_withdrawAmount2)
+        setWithdrawStatus1(res['data']['data']['withdrawStatus1'])
+        setWithdrawStatus2(res['data']['data']['withdrawStatus2'])
       })
   }
 
@@ -59,11 +73,14 @@ const Dashboard = (props) => {
   const [publicKey, setPublicKey] = useState('');
   const [email, setEmail] = useState('')
   const [loginStatus, setLoginStatus] = useState(false);
-  const [withdrawStatus, setWithdrawStatus] = useState(true)
   const [currentBalance, setCurrecntBalance] = useState(0);
   const [interestEarned, setInterestEarned] = useState(0)
   const [interest, setInterest] = useState(0)
-  const [withdrawAmount, setWithdrawAmount] = useState(0)
+  const [withdrawStatus1, setWithdrawStatus1] = useState(true)
+  const [withdrawStatus2, setWithdrawStatus2] = useState(true)
+  const [withdrawAmount1, setWithdrawAmount1] = useState(0)
+  const [withdrawAmount2, setWithdrawAmount2] = useState(0)
+  const [withdrawType, setWithdrawType] = useState(true)
   const [depositType, setDepositType] = useState(false);
   const [withdrawWallet, setWithdrawWallet] = useState('')
   const [amountForWithdraw, setAmountForWithdraw] = useState(0)
@@ -145,14 +162,17 @@ const Dashboard = (props) => {
           alert('Please enter correct wallet address')
           return;
         } else {
-          if(withdrawStatus) {
+          if(withdrawStatus1 && withdrawType || withdrawStatus2 && !withdrawType) {
+            if (withdrawType) withdrawAmount = withdrawAmount1
+            else withdrawAmount = withdrawAmount2
             var data = {
               userID: localStorage.getItem('user_id'),
               email: email,
               amount: amountForWithdraw,
               balance: currentBalance,
               wallet: withdrawWallet,
-              withdraw: withdrawAmount
+              withdraw: withdrawAmount,
+              withdrawType: withdrawType
             }
             axios.post('http://localhost:5000/api/users/withdraw', data)
               .then(res => {
@@ -185,20 +205,31 @@ const Dashboard = (props) => {
     localStorage.setItem('expire', JSON.parse(jsonPayload)['exp'])
     setEmail(userData['data']['user']['email'])
     setPublicKey(userData['data']['user']['publicKey']);
-    poolValue = userData['data']['user']['totalValue']['polValue']
-    allocation = userData['data']['user']['allocation'] === undefined ? 0 : userData['data']['user']['allocation']
-    depositAmount = userData['data']['user']['depositAmount'] === undefined ? 0 : userData['data']['user']['depositAmount']
-    _withdrawAmount = userData['data']['user']['withdrawnAmount'] === undefined ? 0: userData['data']['user']['withdrawnAmount']
-    _currenctBalance = (poolValue * allocation).toFixed(2) < (depositAmount - _withdrawAmount) ? (depositAmount - _withdrawAmount) : (poolValue * allocation).toFixed(2)
-    _interestEarned = (_currenctBalance - depositAmount + _withdrawAmount).toFixed(2)
-    console.log(depositAmount, _withdrawAmount, _currenctBalance, _interestEarned)
-    if(_currenctBalance > (depositAmount - _withdrawAmount).toFixed(2)) _interest = depositAmount === 0 ? 0 : ((_currenctBalance - depositAmount) * 100 / depositAmount).toFixed(2);
-    else _interest = 0
-    setCurrecntBalance(_currenctBalance)
-    setInterestEarned(_interestEarned);
-    setInterest(_interest)
-    setWithdrawAmount(_withdrawAmount)
-    setWithdrawStatus(userData['data']['user']['withdrawStatus'])
+    usdcValue = userData['data']['user']['totalValue']['usdcValue'] + userData['data']['user']['totalValue']['investAmount']
+    realtValue = userData['data']['user']['totalValue']['realtValue']
+    gnosisValue = userData['data']['user']['totalValue']['gnosisValue']
+    gcValue = realtValue + gnosisValue
+    allocation1 = userData['data']['user']['allocation1'] === undefined ? 0 : userData['data']['user']['allocation1']
+    allocation2 = userData['data']['user']['allocation2'] === undefined ? 0 : userData['data']['user']['allocation2']
+    depositAmount1 = userData['data']['user']['depositAmount1'] === undefined ? 0 : userData['data']['user']['depositAmount1']
+    depositAmount2 = userData['data']['user']['depositAmount2'] === undefined ? 0 : userData['data']['user']['depositAmount2']
+    _withdrawAmount1 = userData['data']['user']['withdrawnAmount1'] === undefined ? 0: userData['data']['user']['withdrawnAmount1']
+    _withdrawAmount2 = userData['data']['user']['withdrawnAmount2'] === undefined ? 0: userData['data']['user']['withdrawnAmount2']
+    _currenctBalance1 = (usdcValue * allocation1).toFixed(2) < (depositAmount1 - _withdrawAmount1) ? (depositAmount1 - _withdrawAmount1) : (usdcValue * allocation1).toFixed(2)
+    _currenctBalance2 = (gcValue * allocation1).toFixed(2) < (depositAmount2 - _withdrawAmount2) ? (depositAmount2 - _withdrawAmount2) : (gcValue * allocation2).toFixed(2)
+    _interest1Earned1 = (_currenctBalance1 - depositAmount1 + _withdrawAmount1).toFixed(2)
+    _interest1Earned2 = (_currenctBalance2 - depositAmount2 + _withdrawAmount2).toFixed(2)
+    if(_currenctBalance1 > (depositAmount1 - _withdrawAmount1).toFixed(2)) _interest1 = depositAmount1 === 0 ? 0 : ((_currenctBalance1 - depositAmount1) * 100 / depositAmount1).toFixed(2);
+    else _interest1 = 0
+    if(_currenctBalance2 > (depositAmount2 - _withdrawAmount2).toFixed(2)) _interest2 = depositAmount2 === 0 ? 0 : ((_currenctBalance2 - depositAmount2) * 100 / depositAmount2).toFixed(2);
+    else _interest2 = 0
+    setCurrecntBalance(Number(_currenctBalance1) + Number(_currenctBalance2))
+    setInterestEarned(Number(_interest1Earned1) + Number(_interest1Earned2));
+    setInterest(Number(_interest1) + Number(_interest2))
+    setWithdrawAmount1(_withdrawAmount1)
+    setWithdrawAmount2(_withdrawAmount2)
+    setWithdrawStatus1(userData['data']['user']['withdrawStatus1'])
+    setWithdrawStatus2(userData['data']['user']['withdrawStatus2'])
   } 
 
   const showSpinner = () => { props.spinner(true) }
@@ -309,7 +340,7 @@ const Dashboard = (props) => {
                 <div className="flex-row interest" role="cell">{interestEarned} USDC</div>
                 <div className='flex-row type' role='columnheader'>
                   <button className='btn' onClick={() => {showDepositModal(); setMainAddr('0x0102b5296D12327111c231C864Af078FdEef2Ade')}}><HiPlusSm /></button>
-                  <button className='btn' onClick={showWithdrawModal}><HiMinusSm /></button>
+                  <button className='btn' onClick={() => {showWithdrawModal(); setWithdrawType(true)}}><HiMinusSm /></button>
                 </div>
               </div>
               <div className="flex-table row" role="rowgroup">
@@ -319,7 +350,7 @@ const Dashboard = (props) => {
                 <div className="flex-row interest" role="cell">{interestEarned} USDC</div>
                 <div className='flex-row type' role='columnheader'>
                   <button className='btn' onClick={() => {showDepositModal(); setMainAddr('0x85A4602B2248745148e453Aa28fcD6f7d8d80674')}}><HiPlusSm /></button>
-                  <button className='btn' onClick={showWithdrawModal}><HiMinusSm /></button>
+                  <button className='btn' onClick={() => {showWithdrawModal(); setWithdrawType(false)}}><HiMinusSm /></button>
                 </div>
               </div>
             </div>
@@ -328,7 +359,7 @@ const Dashboard = (props) => {
             <p>Risk strategies</p>
             <div className="table-container" role="table" aria-label="Destinations">
               <div className="flex-table header" role="rowgroup">
-                <div className="flex-row-1 first" role="columnheader">Asset/Currency</div>
+                <div className="flex-row-2 first" role="columnheader">Asset/Curre2cy</div>
                 <div className="flex-row-1" role="columnheader">APY</div>
                 <div className="flex-row-1" role="columnheader">Balance</div>
               </div>
