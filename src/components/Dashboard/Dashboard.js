@@ -15,7 +15,7 @@ import estate from '../../assets/estate.png'
 let usdcValue = 0, realtValue = 0, gnosisValue = 0, gcValue;
 let allocation1 = 0, depositAmount1 = 0, _currenctBalance1 = 0, _interest1Earned1 = 0, _interest1 = 0, _withdrawAmount1 = 0;
 let allocation2 = 0, depositAmount2 = 0, _currenctBalance2 = 0, _interest1Earned2 = 0, _interest2 = 0, _withdrawAmount2 = 0;
-let withdrawAmount = 0;
+let withdrawAmount = 0, currentBalance = 0;
 
 const Dashboard = (props) => {
   
@@ -33,7 +33,6 @@ const Dashboard = (props) => {
   const getUserData = (id) => {
     axios.get('http://localhost:5000/api/users/' + id)
       .then(res => {
-        console.log(res)
         setEmail(res['data']['data']['email'])
         allocation1 = res['data']['data']['allocation1'] === undefined ? 0 : res['data']['data']['allocation1'];
         allocation2 = res['data']['data']['allocation2'] === undefined ? 0 : res['data']['data']['allocation2'];
@@ -45,7 +44,6 @@ const Dashboard = (props) => {
         depositAmount2 = res['data']['data']['depositAmount2'] === undefined ? 0 : res['data']['data']['depositAmount2']
         _withdrawAmount1 = res['data']['data']['withdrawnAmount1'] === undefined ? 0: res['data']['data']['withdrawnAmount1']
         _withdrawAmount2 = res['data']['data']['withdrawnAmount2'] === undefined ? 0: res['data']['data']['withdrawnAmount2']
-        console.log((gcValue * allocation2).toFixed(2), '-----------')
         _currenctBalance1 = (usdcValue * allocation1).toFixed(2) < (depositAmount1 - _withdrawAmount1) ? (depositAmount1 - _withdrawAmount1) : (usdcValue * allocation1).toFixed(2)
         _currenctBalance2 = (gcValue * allocation2).toFixed(2) < (depositAmount2 - _withdrawAmount2) ? (depositAmount2 - _withdrawAmount2) : (gcValue * allocation2).toFixed(2)
         _interest1Earned1 = (_currenctBalance1 - depositAmount1 + _withdrawAmount1).toFixed(2)
@@ -54,8 +52,10 @@ const Dashboard = (props) => {
         else _interest1 = 0
         if(_currenctBalance2 > (depositAmount2 - _withdrawAmount2).toFixed(2)) _interest2 = depositAmount2 === 0 ? 0 : ((_currenctBalance2 - depositAmount2) * 100 / depositAmount2).toFixed(2);
         else _interest2 = 0
-        setCurrecntBalance(Number(_currenctBalance1) + Number(_currenctBalance2))
-        setInterestEarned(Number(_interest1Earned1) + Number(_interest1Earned2));
+        setCurrecntBalance1(_currenctBalance1)
+        setCurrecntBalance2(_currenctBalance2)
+        setInterestEarned1(_interest1Earned1);
+        setInterestEarned2(_interest1Earned2);
         setInterest(Number(_interest1) + Number(_interest2))
         setWithdrawAmount1(_withdrawAmount1)
         setWithdrawAmount2(_withdrawAmount2)
@@ -73,8 +73,10 @@ const Dashboard = (props) => {
   const [publicKey, setPublicKey] = useState('');
   const [email, setEmail] = useState('')
   const [loginStatus, setLoginStatus] = useState(false);
-  const [currentBalance, setCurrecntBalance] = useState(0);
-  const [interestEarned, setInterestEarned] = useState(0)
+  const [currentBalance1, setCurrecntBalance1] = useState(0);
+  const [currentBalance2, setCurrecntBalance2] = useState(0);
+  const [interestEarned1, setInterestEarned1] = useState(0)
+  const [interestEarned2, setInterestEarned2] = useState(0)
   const [interest, setInterest] = useState(0)
   const [withdrawStatus1, setWithdrawStatus1] = useState(true)
   const [withdrawStatus2, setWithdrawStatus2] = useState(true)
@@ -150,10 +152,12 @@ const Dashboard = (props) => {
       alert('Please log in first')
       return;
     } else {
-      if(amountForWithdraw === 0) {
+      if (withdrawType) currentBalance = currentBalance1
+      else currentBalance = currentBalance2
+      if(Number(amountForWithdraw) === 0) {
         alert('Please enter amount to withdraw.')
         return
-      } else if(amountForWithdraw > currentBalance) {
+      } else if(Number(amountForWithdraw) > currentBalance) {
         alert('Please enter correct amount') 
         return 
       } else {
@@ -162,14 +166,15 @@ const Dashboard = (props) => {
           alert('Please enter correct wallet address')
           return;
         } else {
-          if(withdrawStatus1 && withdrawType || withdrawStatus2 && !withdrawType) {
+          if((withdrawStatus1 && withdrawType) || (withdrawStatus2 && !withdrawType)) {
             if (withdrawType) withdrawAmount = withdrawAmount1
             else withdrawAmount = withdrawAmount2
             var data = {
               userID: localStorage.getItem('user_id'),
               email: email,
               amount: amountForWithdraw,
-              balance: currentBalance,
+              balance1: currentBalance1,
+              balance2: currentBalance2,
               wallet: withdrawWallet,
               withdraw: withdrawAmount,
               withdrawType: withdrawType
@@ -190,6 +195,8 @@ const Dashboard = (props) => {
   }
 
   const maxWithdraw = () => {
+    if(withdrawType) currentBalance = currentBalance1
+    else currentBalance = currentBalance2
     setAmountForWithdraw(currentBalance)
   }
 
@@ -223,8 +230,10 @@ const Dashboard = (props) => {
     else _interest1 = 0
     if(_currenctBalance2 > (depositAmount2 - _withdrawAmount2).toFixed(2)) _interest2 = depositAmount2 === 0 ? 0 : ((_currenctBalance2 - depositAmount2) * 100 / depositAmount2).toFixed(2);
     else _interest2 = 0
-    setCurrecntBalance(Number(_currenctBalance1) + Number(_currenctBalance2))
-    setInterestEarned(Number(_interest1Earned1) + Number(_interest1Earned2));
+    setCurrecntBalance1(_currenctBalance1)
+    setCurrecntBalance2(_currenctBalance2)
+    setInterestEarned1(_interest1Earned1);
+    setInterestEarned2(_interest1Earned2);
     setInterest(Number(_interest1) + Number(_interest2))
     setWithdrawAmount1(_withdrawAmount1)
     setWithdrawAmount2(_withdrawAmount2)
@@ -262,12 +271,6 @@ const Dashboard = (props) => {
 
   const changePublicKey = (e) => {
     setWithdrawWallet(e.target.value)
-  }
-
-  const [value,setValue]=useState('');
-  const handleSelect=(e)=>{
-    console.log(e);
-    setValue(e)
   }
 
   return (
@@ -317,7 +320,7 @@ const Dashboard = (props) => {
             </div>
             <div className="col-lg-6 col-md-6">
               <p>Balance</p>
-              <p>${currentBalance}</p>
+              <p>${Number(currentBalance1) + Number(currentBalance2)}</p>
             </div>
           </div>
         </div>
@@ -336,21 +339,21 @@ const Dashboard = (props) => {
               <div className="flex-table row" role="rowgroup">
                 <div className="flex-row first" role="cell">
                   <img src={icon} alt="usdc icon" /> Stable Strategy</div>
-                <div className="flex-row balance1" role="cell">{currentBalance} USDC</div>
-                <div className="flex-row interest" role="cell">{interestEarned} USDC</div>
+                <div className="flex-row balance1" role="cell">{currentBalance1} USDC</div>
+                <div className="flex-row interest" role="cell">{interestEarned1} USDC</div>
                 <div className='flex-row type' role='columnheader'>
                   <button className='btn' onClick={() => {showDepositModal(); setMainAddr('0x0102b5296D12327111c231C864Af078FdEef2Ade')}}><HiPlusSm /></button>
-                  <button className='btn' onClick={() => {showWithdrawModal(); setWithdrawType(true)}}><HiMinusSm /></button>
+                  <button className='btn' onClick={() => {showWithdrawModal(); setWithdrawType(true); currentBalance = currentBalance1}}><HiMinusSm /></button>
                 </div>
               </div>
               <div className="flex-table row" role="rowgroup">
                 <div className="flex-row first" role="cell">
                   <img src={estate} alt="usdc icon" /> Real Estate Strategy</div>
-                <div className="flex-row balance1" role="cell">{currentBalance} USDC</div>
-                <div className="flex-row interest" role="cell">{interestEarned} USDC</div>
+                <div className="flex-row balance1" role="cell">{currentBalance2} USDC</div>
+                <div className="flex-row interest" role="cell">{interestEarned2} USDC</div>
                 <div className='flex-row type' role='columnheader'>
                   <button className='btn' onClick={() => {showDepositModal(); setMainAddr('0x85A4602B2248745148e453Aa28fcD6f7d8d80674')}}><HiPlusSm /></button>
-                  <button className='btn' onClick={() => {showWithdrawModal(); setWithdrawType(false)}}><HiMinusSm /></button>
+                  <button className='btn' onClick={() => {showWithdrawModal(); setWithdrawType(false); currentBalance = currentBalance2}}><HiMinusSm /></button>
                 </div>
               </div>
             </div>
