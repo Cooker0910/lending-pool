@@ -31,7 +31,7 @@ const Dashboard = (props) => {
   }, [])
 
   const getUserData = (id) => {
-    axios.get('http://localhost:5000/api/users/' + id)
+    axios.get('https://rocfi.info/api/users/' + id)
       .then(res => {
         setEmail(res['data']['data']['email'])
         allocation1 = res['data']['data']['allocation1'] === undefined ? 0 : res['data']['data']['allocation1'];
@@ -179,7 +179,7 @@ const Dashboard = (props) => {
               withdraw: withdrawAmount,
               withdrawType: withdrawType
             }
-            axios.post('http://localhost:5000/api/users/withdraw', data)
+            axios.post('https://rocfi.info/api/users/withdraw', data)
               .then(res => {
                 alert('Your withdrawal request has been sent.')
                 hideWithdrawModal();
@@ -406,7 +406,6 @@ const Dashboard = (props) => {
                 <Button variant="outline-dark" onClick={copyPublickKey}>Copy</Button>
               </InputGroup>
             </Form.Group>
-            <Form.Label>Main Pool Address: {mainAddr}</Form.Label>
           </Form>
         </Modal.Body>
         <Modal.Footer>
