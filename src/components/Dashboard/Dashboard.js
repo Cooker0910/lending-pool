@@ -362,7 +362,7 @@ const Dashboard = (props) => {
             <p>Risk strategies</p>
             <div className="table-container" role="table" aria-label="Destinations">
               <div className="flex-table header" role="rowgroup">
-                <div className="flex-row-2 first" role="columnheader">Asset/Curre2cy</div>
+                <div className="flex-row-1 first" role="columnheader">Asset/Currency</div>
                 <div className="flex-row-1" role="columnheader">APY</div>
                 <div className="flex-row-1" role="columnheader">Balance</div>
               </div>
