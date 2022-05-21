@@ -57,7 +57,7 @@ const Dashboard = (props) => {
         setCurrecntBalance2(_currenctBalance2)
         setInterestEarned1(_interest1Earned1);
         setInterestEarned2(_interest1Earned2);
-        setInterest(Number(_interest1) + Number(_interest2))
+        setInterest((Number(_interest1) + Number(_interest2)).toFixed(2))
         setWithdrawAmount1(_withdrawAmount1)
         setWithdrawAmount2(_withdrawAmount2)
         setWithdrawStatus1(res['data']['data']['withdrawStatus1'])
