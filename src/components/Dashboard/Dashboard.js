@@ -52,6 +52,7 @@ const Dashboard = (props) => {
         else _interest1 = 0
         if(_currenctBalance2 > (depositAmount2 - _withdrawAmount2).toFixed(2)) _interest2 = depositAmount2 === 0 ? 0 : ((_currenctBalance2 - depositAmount2) * 100 / depositAmount2).toFixed(2);
         else _interest2 = 0
+        console.log(_interest1, '===', _interest2)
         setCurrecntBalance1(_currenctBalance1)
         setCurrecntBalance2(_currenctBalance2)
         setInterestEarned1(_interest1Earned1);
@@ -230,6 +231,7 @@ const Dashboard = (props) => {
     else _interest1 = 0
     if(_currenctBalance2 > (depositAmount2 - _withdrawAmount2).toFixed(2)) _interest2 = depositAmount2 === 0 ? 0 : ((_currenctBalance2 - depositAmount2) * 100 / depositAmount2).toFixed(2);
     else _interest2 = 0
+    console.log(_interest1, '---', _interest2)
     setCurrecntBalance1(_currenctBalance1)
     setCurrecntBalance2(_currenctBalance2)
     setInterestEarned1(_interest1Earned1);
