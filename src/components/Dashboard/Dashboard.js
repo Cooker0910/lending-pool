@@ -86,7 +86,6 @@ const Dashboard = (props) => {
   const [depositType, setDepositType] = useState(false);
   const [withdrawWallet, setWithdrawWallet] = useState('')
   const [amountForWithdraw, setAmountForWithdraw] = useState(0)
-  const [mainAddr, setMainAddr] = useState('')
   const [data, setData] = useState({
     to: "",
     from: ""
