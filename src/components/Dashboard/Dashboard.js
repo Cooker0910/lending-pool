@@ -342,7 +342,7 @@ const Dashboard = (props) => {
                 <div className="flex-row balance1" role="cell">{currentBalance1} USDC</div>
                 <div className="flex-row interest" role="cell">{interestEarned1} USDC</div>
                 <div className='flex-row type' role='columnheader'>
-                  <button className='btn' onClick={() => {showDepositModal(); setMainAddr('0x0102b5296D12327111c231C864Af078FdEef2Ade')}}><HiPlusSm /></button>
+                  <button className='btn' onClick={() => {showDepositModal();}}><HiPlusSm /></button>
                   <button className='btn' onClick={() => {showWithdrawModal(); setWithdrawType(true); currentBalance = currentBalance1}}><HiMinusSm /></button>
                 </div>
               </div>
@@ -352,7 +352,7 @@ const Dashboard = (props) => {
                 <div className="flex-row balance1" role="cell">{currentBalance2} USDC</div>
                 <div className="flex-row interest" role="cell">{interestEarned2} USDC</div>
                 <div className='flex-row type' role='columnheader'>
-                  <button className='btn' onClick={() => {showDepositModal(); setMainAddr('0x85A4602B2248745148e453Aa28fcD6f7d8d80674')}}><HiPlusSm /></button>
+                  <button className='btn' onClick={() => {showDepositModal();}}><HiPlusSm /></button>
                   <button className='btn' onClick={() => {showWithdrawModal(); setWithdrawType(false); currentBalance = currentBalance2}}><HiMinusSm /></button>
                 </div>
               </div>
