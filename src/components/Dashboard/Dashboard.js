@@ -44,8 +44,8 @@ const Dashboard = (props) => {
         depositAmount2 = res['data']['data']['depositAmount2'] === undefined ? 0 : res['data']['data']['depositAmount2']
         _withdrawAmount1 = res['data']['data']['withdrawnAmount1'] === undefined ? 0: res['data']['data']['withdrawnAmount1']
         _withdrawAmount2 = res['data']['data']['withdrawnAmount2'] === undefined ? 0: res['data']['data']['withdrawnAmount2']
-        _currenctBalance1 = (usdcValue * allocation1).toFixed(2) < (depositAmount1 - _withdrawAmount1) ? (depositAmount1 - _withdrawAmount1) : (usdcValue * allocation1).toFixed(2)
-        _currenctBalance2 = (gcValue * allocation2).toFixed(2) < (depositAmount2 - _withdrawAmount2) ? (depositAmount2 - _withdrawAmount2) : (gcValue * allocation2).toFixed(2)
+        _currenctBalance1 = (usdcValue * allocation1).toFixed(2) < (depositAmount1 - _withdrawAmount1) ? (depositAmount1 - _withdrawAmount1).toFixed(2) : (usdcValue * allocation1).toFixed(2)
+        _currenctBalance2 = (gcValue * allocation2).toFixed(2) < (depositAmount2 - _withdrawAmount2) ? (depositAmount2 - _withdrawAmount2).toFixed(2) : (gcValue * allocation2).toFixed(2)
         _interest1Earned1 = (_currenctBalance1 - depositAmount1 + _withdrawAmount1).toFixed(2)
         _interest1Earned2 = (_currenctBalance2 - depositAmount2 + _withdrawAmount2).toFixed(2)
         if(_currenctBalance1 > (depositAmount1 - _withdrawAmount1).toFixed(2)) _interest1 = depositAmount1 === 0 ? 0 : ((_currenctBalance1 - depositAmount1) * 100 / depositAmount1).toFixed(2);
@@ -319,7 +319,7 @@ const Dashboard = (props) => {
             </div>
             <div className="col-lg-6 col-md-6">
               <p>Balance</p>
-              <p>${Number(currentBalance1) + Number(currentBalance2)}</p>
+              <p>${(Number(currentBalance1) + Number(currentBalance2)).toFixed(2)}</p>
             </div>
           </div>
         </div>
