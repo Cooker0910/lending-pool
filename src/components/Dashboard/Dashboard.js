@@ -12,7 +12,7 @@ import Login from '../Account/LogIn';
 import icon from '../../assets/usdc-coin.png';
 import logo from '../../assets/logo.jpg'
 import estate from '../../assets/estate.png'
-let usdcValue = 0, realtValue = 0, gnosisValue = 0, gcValue;
+let usdcValue = 0, realtValue = 0, gnosisValue = 0, gcValue = 0, preRealtValue = 0;
 let allocation1 = 0, depositAmount1 = 0, _currenctBalance1 = 0, _interest1Earned1 = 0, _interest1 = 0, _withdrawAmount1 = 0;
 let allocation2 = 0, depositAmount2 = 0, _currenctBalance2 = 0, _interest1Earned2 = 0, _interest2 = 0, _withdrawAmount2 = 0;
 let withdrawAmount = 0, currentBalance = 0;
@@ -37,9 +37,10 @@ const Dashboard = (props) => {
         allocation1 = res['data']['data']['allocation1'] === undefined ? 0 : res['data']['data']['allocation1'];
         allocation2 = res['data']['data']['allocation2'] === undefined ? 0 : res['data']['data']['allocation2'];
         usdcValue = res['data']['totalValue']['usdcValue'] + res['data']['totalValue']['investAmount']
+        preRealtValue = res['data']['data']['preRealtBalance']
         realtValue = res['data']['totalValue']['realtValue']
         gnosisValue = res['data']['totalValue']['gnosisValue']
-        gcValue = realtValue + gnosisValue
+        gcValue = gnosisValue + preRealtValue;
         depositAmount1 = res['data']['data']['depositAmount1'] === undefined ? 0 : res['data']['data']['depositAmount1']
         depositAmount2 = res['data']['data']['depositAmount2'] === undefined ? 0 : res['data']['data']['depositAmount2']
         _withdrawAmount1 = res['data']['data']['withdrawnAmount1'] === undefined ? 0: res['data']['data']['withdrawnAmount1']
@@ -212,9 +213,10 @@ const Dashboard = (props) => {
     setEmail(userData['data']['user']['email'])
     setPublicKey(userData['data']['user']['publicKey']);
     usdcValue = userData['data']['user']['totalValue']['usdcValue'] + userData['data']['user']['totalValue']['investAmount']
+    preRealtValue = userData['data']['user']['preRealtBalance']
     realtValue = userData['data']['user']['totalValue']['realtValue']
     gnosisValue = userData['data']['user']['totalValue']['gnosisValue']
-    gcValue = realtValue + gnosisValue
+    gcValue = gnosisValue + preRealtValue;
     allocation1 = userData['data']['user']['allocation1'] === undefined ? 0 : userData['data']['user']['allocation1']
     allocation2 = userData['data']['user']['allocation2'] === undefined ? 0 : userData['data']['user']['allocation2']
     depositAmount1 = userData['data']['user']['depositAmount1'] === undefined ? 0 : userData['data']['user']['depositAmount1']
