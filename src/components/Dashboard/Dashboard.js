@@ -279,7 +279,7 @@ const Dashboard = (props) => {
       <div className='left'>
         <Container>
           <Navbar.Brand>
-            <img src={logo} alt="logo" className='logo' />
+            {/* <img src={logo} alt="logo" className='logo' /> */}
             ROC
           </Navbar.Brand>
         </Container>
@@ -369,7 +369,13 @@ const Dashboard = (props) => {
               </div>
               <div className="flex-table row" role="rowgroup">
                 <div className="flex-row-1 first" role="cell">
-                  <img src={icon} alt="usdc icon" /> Stable Strategies</div>
+                  <img src={icon} alt="usdc icon" /> Stable Strategy</div>
+                <div className="flex-row-1" role="cell">8~12%</div>
+                <div className="flex-row-1" role="cell">{currentBalance} USDC</div>
+              </div>
+              <div className="flex-table row" role="rowgroup">
+                <div className="flex-row-1 first" role="cell">
+                  <img src={icon} alt="usdc icon" /> Real Estate Strategy</div>
                 <div className="flex-row-1" role="cell">8~12%</div>
                 <div className="flex-row-1" role="cell">{currentBalance} USDC</div>
               </div>
