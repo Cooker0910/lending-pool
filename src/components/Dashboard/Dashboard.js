@@ -37,9 +37,9 @@ const Dashboard = (props) => {
         allocation1 = res['data']['data']['allocation1'] === undefined ? 0 : res['data']['data']['allocation1'];
         allocation2 = res['data']['data']['allocation2'] === undefined ? 0 : res['data']['data']['allocation2'];
         usdcValue = res['data']['totalValue']['usdcValue'] + res['data']['totalValue']['investAmount']
-        preRealtValue = res['data']['data']['preRealtBalance']
-        realtValue = res['data']['totalValue']['realtValue']
-        gnosisValue = res['data']['totalValue']['gnosisValue']
+        preRealtValue = res['data']['data']['preRealtBalance'] === undefined ? 0 : res['data']['data']['preRealtBalance'];
+        realtValue = res['data']['totalValue']['realtValue'] === undefined ? 0: res['data']['data']['realtValue'];
+        gnosisValue = res['data']['totalValue']['gnosisValue'] === undefined ? 0 : res['data']['totalValue']['gnosisValue'];
         gcValue = gnosisValue + preRealtValue;
         depositAmount1 = res['data']['data']['depositAmount1'] === undefined ? 0 : res['data']['data']['depositAmount1']
         depositAmount2 = res['data']['data']['depositAmount2'] === undefined ? 0 : res['data']['data']['depositAmount2']
@@ -213,9 +213,9 @@ const Dashboard = (props) => {
     setEmail(userData['data']['user']['email'])
     setPublicKey(userData['data']['user']['publicKey']);
     usdcValue = userData['data']['user']['totalValue']['usdcValue'] + userData['data']['user']['totalValue']['investAmount']
-    preRealtValue = userData['data']['user']['preRealtBalance']
-    realtValue = userData['data']['user']['totalValue']['realtValue']
-    gnosisValue = userData['data']['user']['totalValue']['gnosisValue']
+    preRealtValue = userData['data']['user']['preRealtBalance'] === undefined ? 0 : userData['data']['user']['preRealtBalance'];
+    realtValue = userData['data']['user']['totalValue']['realtValue'] === undefined ? 0 : userData['data']['user']['realtValue'];
+    gnosisValue = userData['data']['user']['totalValue']['gnosisValue'] === undefined ? 0 : userData['data']['user']['gnosisValue'];
     gcValue = gnosisValue + preRealtValue;
     allocation1 = userData['data']['user']['allocation1'] === undefined ? 0 : userData['data']['user']['allocation1']
     allocation2 = userData['data']['user']['allocation2'] === undefined ? 0 : userData['data']['user']['allocation2']
@@ -375,7 +375,7 @@ const Dashboard = (props) => {
               </div>
               <div className="flex-table row" role="rowgroup">
                 <div className="flex-row-1 first" role="cell">
-                  <img src={icon} alt="usdc icon" /> Real Estate Strategy</div>
+                  <img src={estate} alt="usdc icon" /> Real Estate Strategy</div>
                 <div className="flex-row-1" role="cell">8~12%</div>
                 <div className="flex-row-1" role="cell">{currentBalance} USDC</div>
               </div>

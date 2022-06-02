@@ -1,27 +1,26 @@
 .left {
   width: 100px;
   position: fixed;
-  background: #172566;
+  /* background: #172566; */
   height: 100%;
   left: 0;
   top: 0;
   z-index: 10;
 }
 .left .container {
-  padding: 17px;
+  padding: 14px;
 }
 .top {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background: #cccccc;
+  background: hsl(141deg 98% 79%);
 }
 .content-one {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #003060;
   padding: 8rem 12rem 3rem 15rem;
 }
 .balance {
@@ -30,7 +29,6 @@
   font-weight: 700;
   padding-bottom: 40px;
   text-align: left;
-  color: white;
 }
 .details {
   display: flex;
