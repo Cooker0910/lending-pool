@@ -33,18 +33,20 @@ const Dashboard = (props) => {
   const getUserData = (id) => {
     axios.get('https://rocfi.info/api/users/' + id)
       .then(res => {
-        setEmail(res['data']['data']['email'])
-        allocation1 = res['data']['data']['allocation1'] === undefined ? 0 : res['data']['data']['allocation1'];
-        allocation2 = res['data']['data']['allocation2'] === undefined ? 0 : res['data']['data']['allocation2'];
+        setEmail(res['data']['user']['email'])
+        allocation1 = res['data']['user']['allocation1'] === undefined ? 0 : res['data']['user']['allocation1'];
+        allocation2 = res['data']['user']['allocation2'] === undefined ? 0 : res['data']['user']['allocation2'];
         usdcValue = res['data']['totalValue']['usdcValue'] + res['data']['totalValue']['investAmount']
-        preRealtValue = res['data']['data']['preRealtBalance'] === undefined ? 0 : res['data']['data']['preRealtBalance'];
-        realtValue = res['data']['totalValue']['realtValue'] === undefined ? 0: res['data']['data']['realtValue'];
-        gnosisValue = res['data']['totalValue']['gnosisValue'] === undefined ? 0 : res['data']['totalValue']['gnosisValue'];
+        preRealtValue = res['data']['user']['preRealtBalance'] === undefined ? 0 : res['data']['user']['preRealtBalance'];
+        realtValue = res['data']['totalValue']['realtValue'] === undefined ? 0: res['data']['totalValue']['realtValue'];
+        gnosisValue = res['data']['totalValue']['gnosisValue'] === undefined ? 0 : res['data']['totalValue']['gnosisValue']; 
         gcValue = gnosisValue + preRealtValue;
-        depositAmount1 = res['data']['data']['depositAmount1'] === undefined ? 0 : res['data']['data']['depositAmount1']
-        depositAmount2 = res['data']['data']['depositAmount2'] === undefined ? 0 : res['data']['data']['depositAmount2']
-        _withdrawAmount1 = res['data']['data']['withdrawnAmount1'] === undefined ? 0: res['data']['data']['withdrawnAmount1']
-        _withdrawAmount2 = res['data']['data']['withdrawnAmount2'] === undefined ? 0: res['data']['data']['withdrawnAmount2']
+        console.log(preRealtValue, 'preRealtValue')
+        console.log(realtValue, 'realtValue')
+        depositAmount1 = res['data']['user']['depositAmount1'] === undefined ? 0 : res['data']['user']['depositAmount1']
+        depositAmount2 = res['data']['user']['depositAmount2'] === undefined ? 0 : res['data']['user']['depositAmount2']
+        _withdrawAmount1 = res['data']['user']['withdrawnAmount1'] === undefined ? 0: res['data']['user']['withdrawnAmount1']
+        _withdrawAmount2 = res['data']['user']['withdrawnAmount2'] === undefined ? 0: res['data']['user']['withdrawnAmount2']
         _currenctBalance1 = (usdcValue * allocation1).toFixed(2) < (depositAmount1 - _withdrawAmount1) ? (depositAmount1 - _withdrawAmount1).toFixed(2) : (usdcValue * allocation1).toFixed(2)
         _currenctBalance2 = (gcValue * allocation2).toFixed(2) < (depositAmount2 - _withdrawAmount2) ? (depositAmount2 - _withdrawAmount2).toFixed(2) : (gcValue * allocation2).toFixed(2)
         _interest1Earned1 = (_currenctBalance1 - depositAmount1 + _withdrawAmount1).toFixed(2)
@@ -60,8 +62,8 @@ const Dashboard = (props) => {
         setInterest((Number(_interest1) + Number(_interest2)).toFixed(2))
         setWithdrawAmount1(_withdrawAmount1)
         setWithdrawAmount2(_withdrawAmount2)
-        setWithdrawStatus1(res['data']['data']['withdrawStatus1'])
-        setWithdrawStatus2(res['data']['data']['withdrawStatus2'])
+        setWithdrawStatus1(res['data']['user']['withdrawStatus1'])
+        setWithdrawStatus2(res['data']['user']['withdrawStatus2'])
       })
   }
 
@@ -201,6 +203,7 @@ const Dashboard = (props) => {
   }
 
   const getUserInfo = (userData) => {
+    console.log(userData, 'userData')
     var base64Url = userData['data']['token'].split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
@@ -212,13 +215,15 @@ const Dashboard = (props) => {
     localStorage.setItem('expire', JSON.parse(jsonPayload)['exp'])
     setEmail(userData['data']['user']['email'])
     setPublicKey(userData['data']['user']['publicKey']);
-    usdcValue = userData['data']['user']['totalValue']['usdcValue'] + userData['data']['user']['totalValue']['investAmount']
-    preRealtValue = userData['data']['user']['preRealtBalance'] === undefined ? 0 : userData['data']['user']['preRealtBalance'];
-    realtValue = userData['data']['user']['totalValue']['realtValue'] === undefined ? 0 : userData['data']['user']['realtValue'];
-    gnosisValue = userData['data']['user']['totalValue']['gnosisValue'] === undefined ? 0 : userData['data']['user']['gnosisValue'];
-    gcValue = gnosisValue + preRealtValue;
     allocation1 = userData['data']['user']['allocation1'] === undefined ? 0 : userData['data']['user']['allocation1']
     allocation2 = userData['data']['user']['allocation2'] === undefined ? 0 : userData['data']['user']['allocation2']
+    usdcValue = userData['data']['user']['totalValue']['usdcValue'] + userData['data']['user']['totalValue']['investAmount']
+    preRealtValue = userData['data']['user']['preRealtBalance'] === undefined ? 0 : userData['data']['user']['preRealtBalance'];
+    realtValue = userData['data']['user']['totalValue']['realtValue'] === undefined ? 0 : userData['data']['user']['totalValue']['realtValue'];
+    gnosisValue = userData['data']['user']['totalValue']['gnosisValue'] === undefined ? 0 : userData['data']['user']['totalValue']['gnosisValue'];
+    gcValue = gnosisValue + preRealtValue;
+    console.log(preRealtValue, 'preRealtValue')
+    console.log(realtValue, 'realtValue')
     depositAmount1 = userData['data']['user']['depositAmount1'] === undefined ? 0 : userData['data']['user']['depositAmount1']
     depositAmount2 = userData['data']['user']['depositAmount2'] === undefined ? 0 : userData['data']['user']['depositAmount2']
     _withdrawAmount1 = userData['data']['user']['withdrawnAmount1'] === undefined ? 0: userData['data']['user']['withdrawnAmount1']
