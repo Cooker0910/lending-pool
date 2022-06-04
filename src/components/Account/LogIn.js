@@ -20,7 +20,7 @@ const Login = (props) => {
 
   const login = () => {
     props.showSpinner()
-    axios.post("https://rocfi.info/api/users/login", user)
+    axios.post("https://backend.rocfi.org/api/users/login", user)
     .then((res) => {
       console.log(res)
       props.userInfo(res)

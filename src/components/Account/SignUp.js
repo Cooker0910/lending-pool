@@ -21,7 +21,7 @@ const SignUp = (props) => {
 
   const register = () => {
     props.showSpinner()
-    axios.post("https://rocfi.info/api/users/register", {
+    axios.post("https://backend.rocfi.org/api/users/register", {
       ...user,
     })
     .then(res => {

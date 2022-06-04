@@ -31,7 +31,7 @@ const Dashboard = (props) => {
   }, [])
 
   const getUserData = (id) => {
-    axios.get('https://rocfi.info/api/users/' + id)
+    axios.get('https://backend.rocfi.org/api/users/' + id)
       .then(res => {
         setEmail(res['data']['user']['email'])
         allocation1 = res['data']['user']['allocation1'] === undefined ? 0 : res['data']['user']['allocation1'];
@@ -181,7 +181,7 @@ const Dashboard = (props) => {
               withdraw: withdrawAmount,
               withdrawType: withdrawType
             }
-            axios.post('https://rocfi.info/api/users/withdraw', data)
+            axios.post('https://backend.rocfi.org/api/users/withdraw', data)
               .then(res => {
                 alert('Your withdrawal request has been sent.')
                 hideWithdrawModal();
