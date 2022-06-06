@@ -369,20 +369,20 @@ const Dashboard = (props) => {
             <div className="table-container" role="table" aria-label="Destinations">
               <div className="flex-table header" role="rowgroup">
                 <div className="flex-row-1 first" role="columnheader">Asset/Currency</div>
-                <div className="flex-row-1" role="columnheader">APY</div>
-                <div className="flex-row-1" role="columnheader">Balance</div>
+                <div className="flex-row balance1" role="columnheader">APY</div>
+                <div className="flex-row interest" role="columnheader">Balance</div>
               </div>
               <div className="flex-table row" role="rowgroup">
                 <div className="flex-row-1 first" role="cell">
                   <img src={icon} alt="usdc icon" /> Stable Strategy</div>
-                <div className="flex-row-1" role="cell">8~12%</div>
-                <div className="flex-row-1" role="cell">{currentBalance} USDC</div>
+                <div className="flex-row balance1" role="cell">8~12%</div>
+                <div className="flex-row interest" role="cell">{currentBalance} USDC</div>
               </div>
               <div className="flex-table row" role="rowgroup">
                 <div className="flex-row-1 first" role="cell">
                   <img src={estate} alt="usdc icon" /> Real Estate Strategy</div>
-                <div className="flex-row-1" role="cell">8~12%</div>
-                <div className="flex-row-1" role="cell">{currentBalance} USDC</div>
+                <div className="flex-row balance1" role="cell">8~12%</div>
+                <div className="flex-row interest" role="cell">{currentBalance} USDC</div>
               </div>
             </div>
           </div>
